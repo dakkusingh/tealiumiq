@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\tealiumiq;
+namespace Drupal\tealiumiq\Plugin\tealium\Group;
 
 use Drupal\Component\Plugin\PluginBase;
 

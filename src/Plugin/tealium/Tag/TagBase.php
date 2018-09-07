@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\tealiumiq;
+namespace Drupal\tealiumiq\Plugin\tealium\Tag;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Form\FormStateInterface;

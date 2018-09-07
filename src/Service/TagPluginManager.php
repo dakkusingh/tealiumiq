@@ -17,7 +17,7 @@ class TagPluginManager extends DefaultPluginManager {
   public function __construct(\Traversable $namespaces,
                               CacheBackendInterface $cache_backend,
                               ModuleHandlerInterface $module_handler) {
-    $subdir = 'Plugin/tealiumiq/Tag';
+    $subdir = 'Plugin/tealium/Tag';
 
     // The name of the annotation class that contains the plugin definition.
     $plugin_definition_annotation_name = 'Drupal\tealiumiq\Annotation\TealiumiqTag';

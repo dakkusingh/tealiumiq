@@ -17,7 +17,7 @@ class GroupPluginManager extends DefaultPluginManager {
   public function __construct(\Traversable $namespaces,
                               CacheBackendInterface $cache_backend,
                               ModuleHandlerInterface $module_handler) {
-    $subdir = 'Plugin/tealiumiq/Group';
+    $subdir = 'Plugin/tealium/Group';
 
     // The name of the annotation class that contains the plugin definition.
     $plugin_definition_annotation_name = 'Drupal\tealiumiq\Annotation\TealiumiqGroup';

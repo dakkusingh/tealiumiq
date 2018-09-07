@@ -1,11 +1,9 @@
 <?php
 
-namespace Drupal\tealiumiq\Plugin\tealiumiq\Tag;
-
-use Drupal\tealiumiq\TagBase;
+namespace Drupal\tealiumiq\Plugin\tealium\Tag;
 
 /**
- * The basic "Page Name" tealiumiq tag.
+ * The basic "Page Name" tealium tag.
  *
  * @TealiumiqTag(
  *   id = "page_name",
