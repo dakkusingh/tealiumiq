@@ -1,6 +1,7 @@
 services:
   tealiumiq.udo:
     class: Drupal\tealiumiq\Service\Udo
+    arguments: ["@event_dispatcher"]
 
   tealiumiq.tealiumiq:
     class: Drupal\tealiumiq\Service\Tealiumiq
@@ -13,3 +14,8 @@ services:
   plugin.manager.tealiumiq.group:
     class: Drupal\tealiumiq\TealiumiqGroupPluginManager
     parent: default_plugin_manager
+
+  tealiumiq.alter.udo.properties:
+    class: Drupal\tealiumiq\EventSubscriber\AlterUdoProperties
+    tags:
+      - { name: event_subscriber }

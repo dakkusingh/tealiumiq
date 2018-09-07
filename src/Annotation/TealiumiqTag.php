@@ -44,7 +44,10 @@ class TealiumiqTag extends Plugin {
   public $name;
 
   /**
-   * The group this tealiumiq tag fits in, corresponds to a TealiumiqGroup plugin.
+   * TealiumiqGroup.
+   *
+   * The group this tealiumiq tag fits in,
+   * corresponds to a TealiumiqGroup plugin.
    *
    * @var string
    */

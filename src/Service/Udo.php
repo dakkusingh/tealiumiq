@@ -3,6 +3,8 @@
 namespace Drupal\tealiumiq\Service;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\tealiumiq\Event\AlterUdoPropertiesEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class Udo.
@@ -26,16 +28,28 @@ class Udo {
   public $properties;
 
   /**
+   * Event Dispatcher.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  public $eventDispatcher;
+
+  /**
    * UDO Constructor.
    *
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
+   *   Event Dispatcher.
    * @param string $namespace
    *   The JavaScript namespace to use.
    * @param array $properties
    *   The default properties.
    */
-  public function __construct($namespace = 'utag_data', array $properties = []) {
+  public function __construct(EventDispatcherInterface $eventDispatcher,
+                              $namespace = 'utag_data',
+                              array $properties = []) {
     $this->namespace = $namespace;
     $this->properties = $properties;
+    $this->eventDispatcher = $eventDispatcher;
   }
 
   /**
@@ -75,7 +89,20 @@ class Udo {
    *   All variables.
    */
   public function getProperties() {
-    return $this->properties;
+    // Allow other modules to property variables before we send it.
+    $alterUDOPropertiesEvent = new AlterUdoPropertiesEvent(
+      $this->namespace,
+      $this->properties
+    );
+
+    $event = $this->eventDispatcher->dispatch(
+      AlterUdoPropertiesEvent::UDO_ALTER_PROPERTIES,
+      $alterUDOPropertiesEvent
+    );
+
+    $properties = $event->getProperties();
+
+    return $properties;
   }
 
   /**
