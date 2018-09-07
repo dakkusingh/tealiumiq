@@ -1,0 +1,9 @@
+tealiumiq.settings:
+  path: '/admin/config/services/tealiumiq'
+  defaults:
+    _form: 'Drupal\tealiumiq\Form\Settings'
+    _title: 'Tealium iQ Settings'
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE
