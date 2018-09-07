@@ -28,9 +28,9 @@ class AlterUdoProperties implements EventSubscriberInterface {
     // Example.
     /*
     $event->setProperties(
-      ['foo' => 'bar']
+    ['foo' => 'bar']
     );
-    */
+     */
   }
 
 }

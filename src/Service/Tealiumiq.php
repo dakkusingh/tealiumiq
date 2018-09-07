@@ -6,7 +6,9 @@ use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\views\ViewEntityInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class Tealiumiq.
@@ -44,6 +46,20 @@ class Tealiumiq {
   private $tokenService;
 
   /**
+   * Request Stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  private $requestStack;
+
+  /**
+   * Language Manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  private $languageManager;
+
+  /**
    * Tealiumiq constructor.
    *
    * @param \Drupal\Core\Config\ConfigFactory $config
@@ -51,12 +67,20 @@ class Tealiumiq {
    * @param \Drupal\tealiumiq\Service\Udo $udo
    *   UDO Service.
    * @param \Drupal\tealiumiq\Service\TealiumiqTagPluginManager $tagPluginManager
+   *   Tealiumiq Tag Plugin Manager.
    * @param \Drupal\tealiumiq\Service\TealiumiqToken $token
+   *   Tealiumiq Token.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   Request Stack.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   Language Manager Interface.
    */
   public function __construct(ConfigFactory $config,
                               Udo $udo,
                               TealiumiqTagPluginManager $tagPluginManager,
-                              TealiumiqToken $token) {
+                              TealiumiqToken $token,
+                              RequestStack $requestStack,
+                              LanguageManagerInterface $languageManager) {
     // Get Tealium iQ Settings.
     $this->config = $config->get('tealiumiq.settings');
 
@@ -66,14 +90,11 @@ class Tealiumiq {
     $this->environment = $this->config->get('environment');
     $this->async = $this->config->get('async');
 
-    // UDO.
     $this->udo = $udo;
-
-    // Tag Plugin Manager.
     $this->tagPluginManager = $tagPluginManager;
-
-    // Token Service.
     $this->tokenService = $token;
+    $this->requestStack = $requestStack;
+    $this->languageManager = $languageManager;
   }
 
   /**
@@ -142,7 +163,7 @@ class Tealiumiq {
    */
   public function generateRawElements(array $tags, $entity = NULL) {
     // Ignore the update.php path.
-    $request = \Drupal::request();
+    $request = $this->requestStack->getCurrentRequest();
     if ($request->getBaseUrl() == '/update.php') {
       return [];
     }
@@ -186,7 +207,7 @@ class Tealiumiq {
         // that needs to be filtered and converted to a string.
         // @see Robots::setValue()
         $tag->setValue($value);
-        $langcode = \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
+        $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
 
         $processed_value = PlainTextOutput::renderFromHtml(
           htmlspecialchars_decode(
@@ -217,4 +238,5 @@ class Tealiumiq {
 
     return $rawTags;
   }
+
 }

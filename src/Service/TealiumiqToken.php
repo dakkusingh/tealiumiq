@@ -2,6 +2,7 @@
 
 namespace Drupal\tealiumiq\Service;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Utility\Token;
 use Drupal\Core\Render\BubbleableMetadata;
 
@@ -9,6 +10,8 @@ use Drupal\Core\Render\BubbleableMetadata;
  * Token handling service. Uses core token service or contributed Token.
  */
 class TealiumiqToken {
+
+  use StringTranslationTrait;
 
   /**
    * Token service.
@@ -47,7 +50,8 @@ class TealiumiqToken {
                           array $data = [],
                           array $options = [],
                           BubbleableMetadata $bubbleable_metadata = NULL) {
-    // Set default requirements for Tealiumiq tag unless options specify otherwise.
+    // Set default requirements for Tealiumiq tag
+    // unless options specify otherwise.
     $options = $options + [
       'clear' => TRUE,
     ];
@@ -75,7 +79,7 @@ class TealiumiqToken {
     $form = [];
 
     $form['intro_text'] = [
-      '#markup' => '<p>' . t('<strong>Configure the Tealiumiq tags below.</strong>') . '</p>',
+      '#markup' => '<p>' . $this->t('<strong>Configure the Tealiumiq tags below.</strong>') . '</p>',
     ];
 
     // Normalize taxonomy tokens.
