@@ -7,8 +7,8 @@ namespace Drupal\tealiumiq\Plugin\tealium\Group;
  *
  * @TealiumiqGroup(
  *   id = "page",
- *   label = @Translation("Page Tealium tags"),
- *   description = @Translation("Page Tealium tags."),
+ *   label = @Translation("Page tags"),
+ *   description = @Translation("Page tags."),
  *   weight = 1
  * )
  */

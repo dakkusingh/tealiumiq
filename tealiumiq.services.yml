@@ -5,7 +5,7 @@ services:
 
   tealiumiq.tealiumiq:
     class: Drupal\tealiumiq\Service\Tealiumiq
-    arguments: ["@config.factory", '@tealiumiq.udo', '@tealiumiq.token', '@plugin.manager.tealiumiq.tag', '@request_stack', '@language_manager']
+    arguments: ["@config.factory", '@tealiumiq.udo', '@tealiumiq.token', '@plugin.manager.tealiumiq.group', '@plugin.manager.tealiumiq.tag', '@request_stack', '@language_manager', '@logger.factory']
 
   plugin.manager.tealiumiq.tag:
     class: Drupal\tealiumiq\Service\TagPluginManager
