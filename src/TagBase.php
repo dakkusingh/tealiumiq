@@ -9,7 +9,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 /**
  * Each tealiumiq tag will extend this base.
  */
-abstract class TealiumiqTagBase extends PluginBase {
+abstract class TagBase extends PluginBase {
 
   use StringTranslationTrait;
 

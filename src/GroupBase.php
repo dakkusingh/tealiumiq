@@ -7,7 +7,7 @@ use Drupal\Component\Plugin\PluginBase;
 /**
  * Each group will extend this base.
  */
-abstract class TealiumiqGroupBase extends PluginBase {
+abstract class GroupBase extends PluginBase {
 
   /**
    * Machine name of the tealiumiq tag group plugin.

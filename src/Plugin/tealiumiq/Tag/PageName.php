@@ -2,7 +2,7 @@
 
 namespace Drupal\tealiumiq\Plugin\tealiumiq\Tag;
 
-use Drupal\tealiumiq\TealiumiqTagBase;
+use Drupal\tealiumiq\TagBase;
 
 /**
  * The basic "Page Name" tealiumiq tag.
@@ -19,6 +19,6 @@ use Drupal\tealiumiq\TealiumiqTagBase;
  *   multiple = FALSE
  * )
  */
-class PageName extends TealiumiqTagBase {
+class PageName extends TagBase {
   // Nothing here yet. Just a placeholder class for a plugin.
 }

@@ -34,7 +34,7 @@ class Tealiumiq {
   /**
    * Tag Plugin Manager.
    *
-   * @var \Drupal\tealiumiq\Service\TealiumiqTagPluginManager
+   * @var \Drupal\tealiumiq\Service\TagPluginManager
    */
   protected $tagPluginManager;
 
@@ -66,7 +66,7 @@ class Tealiumiq {
    *   Config Factory.
    * @param \Drupal\tealiumiq\Service\Udo $udo
    *   UDO Service.
-   * @param \Drupal\tealiumiq\Service\TealiumiqTagPluginManager $tagPluginManager
+   * @param \Drupal\tealiumiq\Service\TagPluginManager $tagPluginManager
    *   Tealiumiq Tag Plugin Manager.
    * @param \Drupal\tealiumiq\Service\TealiumiqToken $token
    *   Tealiumiq Token.
@@ -77,8 +77,8 @@ class Tealiumiq {
    */
   public function __construct(ConfigFactory $config,
                               Udo $udo,
-                              TealiumiqTagPluginManager $tagPluginManager,
                               TealiumiqToken $token,
+                              TagPluginManager $tagPluginManager,
                               RequestStack $requestStack,
                               LanguageManagerInterface $languageManager) {
     // Get Tealium iQ Settings.

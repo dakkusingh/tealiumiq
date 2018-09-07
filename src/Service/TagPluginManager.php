@@ -9,7 +9,7 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 /**
  * A Plugin to manage your Tealiumiq tag type.
  */
-class TealiumiqTagPluginManager extends DefaultPluginManager {
+class TagPluginManager extends DefaultPluginManager {
 
   /**
    * {@inheritdoc}

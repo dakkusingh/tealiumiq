@@ -9,7 +9,7 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 /**
  * A Plugin to manage your tealiumiq tag group.
  */
-class TealiumiqGroupPluginManager extends DefaultPluginManager {
+class GroupPluginManager extends DefaultPluginManager {
 
   /**
    * {@inheritdoc}

@@ -5,14 +5,14 @@ services:
 
   tealiumiq.tealiumiq:
     class: Drupal\tealiumiq\Service\Tealiumiq
-    arguments: ["@config.factory", '@tealiumiq.udo', '@plugin.manager.tealiumiq.tag', '@tealiumiq.token', '@request_stack', '@language_manager']
+    arguments: ["@config.factory", '@tealiumiq.udo', '@tealiumiq.token', '@plugin.manager.tealiumiq.tag', '@request_stack', '@language_manager']
 
   plugin.manager.tealiumiq.tag:
-    class: Drupal\tealiumiq\Service\TealiumiqTagPluginManager
+    class: Drupal\tealiumiq\Service\TagPluginManager
     parent: default_plugin_manager
 
   plugin.manager.tealiumiq.group:
-    class: Drupal\tealiumiq\Service\TealiumiqGroupPluginManager
+    class: Drupal\tealiumiq\Service\GroupPluginManager
     parent: default_plugin_manager
 
   tealiumiq.alter.udo.properties:
