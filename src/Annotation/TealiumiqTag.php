@@ -19,7 +19,7 @@ class TealiumiqTag extends Plugin {
   public $id;
 
   /**
-   * The display label/name of the meta tag plugin.
+   * The display label/name of the tealiumiq tag plugin.
    *
    * @var \Drupal\Core\Annotation\Translation
    *
@@ -44,7 +44,7 @@ class TealiumiqTag extends Plugin {
   public $name;
 
   /**
-   * The group this meta tag fits in, corresponds to a TealiumiqGroup plugin.
+   * The group this tealiumiq tag fits in, corresponds to a TealiumiqGroup plugin.
    *
    * @var string
    */

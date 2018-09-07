@@ -5,7 +5,7 @@ namespace Drupal\tealiumiq\Plugin\tealiumiq\Tag;
 use Drupal\tealiumiq\TealiumiqTagBase;
 
 /**
- * The basic "Page Name" meta tag.
+ * The basic "Page Name" tealiumiq tag.
  *
  * @TealiumiqTag(
  *   id = "page_name",
