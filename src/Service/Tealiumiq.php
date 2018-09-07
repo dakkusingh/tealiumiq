@@ -2,7 +2,11 @@
 
 namespace Drupal\tealiumiq\Service;
 
+use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\views\ViewEntityInterface;
 
 /**
  * Class Tealiumiq.
@@ -23,7 +27,21 @@ class Tealiumiq {
    *
    * @var \Drupal\tealiumiq\Service\Udo
    */
-  protected $udo;
+  public $udo;
+
+  /**
+   * Tag Plugin Manager.
+   *
+   * @var \Drupal\tealiumiq\Service\TealiumiqTagPluginManager
+   */
+  protected $tagPluginManager;
+
+  /**
+   * Token Service.
+   *
+   * @var \Drupal\tealiumiq\Service\TealiumiqToken
+   */
+  private $tokenService;
 
   /**
    * Tealiumiq constructor.
@@ -32,9 +50,13 @@ class Tealiumiq {
    *   Config Factory.
    * @param \Drupal\tealiumiq\Service\Udo $udo
    *   UDO Service.
+   * @param \Drupal\tealiumiq\Service\TealiumiqTagPluginManager $tagPluginManager
+   * @param \Drupal\tealiumiq\Service\TealiumiqToken $token
    */
   public function __construct(ConfigFactory $config,
-                              Udo $udo) {
+                              Udo $udo,
+                              TealiumiqTagPluginManager $tagPluginManager,
+                              TealiumiqToken $token) {
     // Get Tealium iQ Settings.
     $this->config = $config->get('tealiumiq.settings');
 
@@ -47,6 +69,11 @@ class Tealiumiq {
     // UDO.
     $this->udo = $udo;
 
+    // Tag Plugin Manager.
+    $this->tagPluginManager = $tagPluginManager;
+
+    // Token Service.
+    $this->tokenService = $token;
   }
 
   /**
@@ -89,4 +116,105 @@ class Tealiumiq {
     return $this->async;
   }
 
+  /**
+   * Gets all data values.
+   *
+   * @return array
+   *   All variables.
+   */
+  public function getProperties() {
+    $properties = $this->udo->getProperties();
+    $raw = $this->generateRawElements($properties);
+
+    return $raw;
+  }
+
+  /**
+   * Generate the actual meta tag values.
+   *
+   * @param array $tags
+   *   The array of tags as plugin_id => value.
+   * @param object $entity
+   *   Optional entity object to use for token replacements.
+   *
+   * @return array
+   *   Render array with tag elements.
+   */
+  public function generateRawElements(array $tags, $entity = NULL) {
+    // Ignore the update.php path.
+    $request = \Drupal::request();
+    if ($request->getBaseUrl() == '/update.php') {
+      return [];
+    }
+
+    $rawTags = [];
+
+    $tealiumiqTags = $this->tagPluginManager->getDefinitions();
+
+    // Order the elements by weight first, as some systems like Facebook care.
+    uksort($tags, function ($tag_name_a, $tag_name_b) use ($tealiumiqTags) {
+      $weight_a = isset($tealiumiqTags[$tag_name_a]['weight']) ? $tealiumiqTags[$tag_name_a]['weight'] : 0;
+      $weight_b = isset($tealiumiqTags[$tag_name_b]['weight']) ? $tealiumiqTags[$tag_name_b]['weight'] : 0;
+
+      return ($weight_a < $weight_b) ? -1 : 1;
+    });
+
+    // Each element of the $values array is a tag with the tag plugin name as
+    // the key.
+    foreach ($tags as $tag_name => $value) {
+      // Check to ensure there is a matching plugin.
+      if (isset($tealiumiqTags[$tag_name])) {
+        // Get an instance of the plugin.
+        $tag = $this->tagPluginManager->createInstance($tag_name);
+
+        // Render any tokens in the value.
+        $token_replacements = [];
+        if ($entity) {
+          // @todo This needs a better way of discovering the context.
+          if ($entity instanceof ViewEntityInterface) {
+            // Views tokens require the ViewExecutable, not the config entity.
+            // @todo Can we move this into metatag_views somehow?
+            $token_replacements = ['view' => $entity->getExecutable()];
+          }
+          elseif ($entity instanceof ContentEntityInterface) {
+            $token_replacements = [$entity->getEntityTypeId() => $entity];
+          }
+        }
+
+        // Set the value as sometimes the data needs massaging, such as when
+        // field defaults are used for the Robots field, which come as an array
+        // that needs to be filtered and converted to a string.
+        // @see Robots::setValue()
+        $tag->setValue($value);
+        $langcode = \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
+
+        $processed_value = PlainTextOutput::renderFromHtml(
+          htmlspecialchars_decode(
+            $this->tokenService->replace(
+              $tag->value(),
+              $token_replacements,
+              ['langcode' => $langcode]
+            )
+          )
+        );
+
+        // Now store the value with processed tokens back into the plugin.
+        $tag->setValue($processed_value);
+
+        // Have the tag generate the output based on the value we gave it.
+        $output = $tag->output();
+
+        if (!empty($output)) {
+          $output = $tag->multiple() ? $output : [$output];
+          foreach ($output as $index => $element) {
+            // Add index to tag name as suffix to avoid having same key.
+            $index_tag_name = $tag->multiple() ? $tag_name . '_' . $index : $tag_name;
+            $rawTags[$index_tag_name] = $element;
+          }
+        }
+      }
+    }
+
+    return $rawTags;
+  }
 }

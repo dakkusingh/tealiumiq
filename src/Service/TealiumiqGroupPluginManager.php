@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\tealiumiq;
+namespace Drupal\tealiumiq\Service;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;

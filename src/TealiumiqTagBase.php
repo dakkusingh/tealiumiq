@@ -342,7 +342,7 @@ abstract class TealiumiqTagBase extends PluginBase {
       }
 
       $elements[] = [
-        '#tag' => 'meta',
+        '#tag' => 'tealiumiq',
         '#attributes' => [
           $this->nameAttribute => $this->name,
           'content' => $value,

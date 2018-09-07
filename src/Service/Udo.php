@@ -114,6 +114,7 @@ class Udo {
     if (is_array($properties)) {
       $this->properties = $properties;
     }
+
     return $this;
   }
 
