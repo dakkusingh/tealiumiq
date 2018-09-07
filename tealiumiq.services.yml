@@ -1,0 +1,6 @@
+services:
+  tealiumiq.udo:
+    class: Drupal\tealiumiq\Service\Udo
+  tealiumiq.tealiumiq:
+    class: Drupal\tealiumiq\Service\Tealiumiq
+    arguments: ["@config.factory", '@tealiumiq.udo']
