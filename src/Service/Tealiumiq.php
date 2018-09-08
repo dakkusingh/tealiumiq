@@ -2,13 +2,9 @@
 
 namespace Drupal\tealiumiq\Service;
 
-use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Config\ConfigFactory;
-use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
-use Drupal\views\ViewEntityInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -68,9 +64,18 @@ class Tealiumiq {
   private $groupPluginManager;
 
   /**
-   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface|\Drupal\tealiumiq\Service\LoggerChannelFactoryInterface
+   * LoggerChannelFactoryInterface.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface
    */
-  private $channelFactory;
+  private $logger;
+
+  /**
+   * Tealium Helper.
+   *
+   * @var \Drupal\tealiumiq\Service\Helper
+   */
+  private $helper;
 
   /**
    * Tealiumiq constructor.
@@ -89,7 +94,10 @@ class Tealiumiq {
    *   Request Stack.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   Language Manager Interface.
-   * @param \Drupal\tealiumiq\Service\LoggerChannelFactoryInterface $channelFactory
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $channelFactory
+   *   Logger Channel Factory Interface.
+   * @param \Drupal\tealiumiq\Service\Helper $helper
+   *   Tealium Helper.
    */
   public function __construct(ConfigFactory $config,
                               Udo $udo,
@@ -98,7 +106,8 @@ class Tealiumiq {
                               TagPluginManager $tagPluginManager,
                               RequestStack $requestStack,
                               LanguageManagerInterface $languageManager,
-                              LoggerChannelFactoryInterface $channelFactory) {
+                              LoggerChannelFactoryInterface $channelFactory,
+                              Helper $helper) {
     // Get Tealium iQ Settings.
     $this->config = $config->get('tealiumiq.settings');
 
@@ -115,6 +124,8 @@ class Tealiumiq {
     $this->languageManager = $languageManager;
     $this->groupPluginManager = $groupPluginManager;
     $this->logger = $channelFactory->get('tealiumiq');
+    $this->helper = $helper;
+    $this->setUdoProperties();
   }
 
   /**
@@ -165,98 +176,26 @@ class Tealiumiq {
    */
   public function getProperties() {
     $properties = $this->udo->getProperties();
-    $raw = $this->generateRawElements($properties);
 
-    return $raw;
+    return $properties;
   }
 
   /**
-   * Generate the actual tealiumiq tag values.
+   * Set all data values.
    *
-   * @param array $tags
-   *   The array of tags as plugin_id => value.
-   * @param object $entity
-   *   Optional entity object to use for token replacements.
-   *
-   * @return array
-   *   Render array with tag elements.
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function generateRawElements(array $tags, $entity = NULL) {
-    // Ignore the update.php path.
-    $request = $this->requestStack->getCurrentRequest();
-    if ($request->getBaseUrl() == '/update.php') {
-      return [];
-    }
+  public function setUdoProperties() {
+    $tags = $this->helper->tagsFromRoute();
 
-    $rawTags = [];
-
-    $tealiumiqTags = $this->tagPluginManager->getDefinitions();
-
-    // Order the elements by weight first, as some systems like Facebook care.
-    uksort($tags, function ($tagName_a, $tagName_b) use ($tealiumiqTags) {
-      $weight_a = isset($tealiumiqTags[$tagName_a]['weight']) ? $tealiumiqTags[$tagName_a]['weight'] : 0;
-      $weight_b = isset($tealiumiqTags[$tagName_b]['weight']) ? $tealiumiqTags[$tagName_b]['weight'] : 0;
-
-      return ($weight_a < $weight_b) ? -1 : 1;
-    });
-
-    // Each element of the $values array is a tag with the tag plugin name as
-    // the key.
-    foreach ($tags as $tagName => $value) {
-      // Check to ensure there is a matching plugin.
-      if (isset($tealiumiqTags[$tagName])) {
-        // Get an instance of the plugin.
-        $tag = $this->tagPluginManager->createInstance($tagName);
-
-        // Render any tokens in the value.
-        $token_replacements = [];
-        if ($entity) {
-          // @todo This needs a better way of discovering the context.
-          if ($entity instanceof ViewEntityInterface) {
-            // Views tokens require the ViewExecutable, not the config entity.
-            // @todo Can we move this into metatag_views somehow?
-            $token_replacements = ['view' => $entity->getExecutable()];
-          }
-          elseif ($entity instanceof ContentEntityInterface) {
-            $token_replacements = [$entity->getEntityTypeId() => $entity];
-          }
-        }
-
-        // Set the value as sometimes the data needs massaging, such as when
-        // field defaults are used for the Robots field, which come as an array
-        // that needs to be filtered and converted to a string.
-        // @see Robots::setValue()
-        $tag->setValue($value);
-        $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
-
-        $processed_value = PlainTextOutput::renderFromHtml(
-          htmlspecialchars_decode(
-            $this->tokenService->replace(
-              $tag->value(),
-              $token_replacements,
-              ['langcode' => $langcode]
-            )
-          )
-        );
-
-        // Now store the value with processed tokens back into the plugin.
-        $tag->setValue($processed_value);
-
-        // Have the tag generate the output based on the value we gave it.
-        $output = $tag->output();
-
-        if (!empty($output)) {
-          $output = $tag->multiple() ? $output : [$output];
-          foreach ($output as $index => $element) {
-            // Add index to tag name as suffix to avoid having same key.
-            $index_tag_name = $tag->multiple() ? $tagName . '_' . $index : $tagName;
-            $rawTags[$index_tag_name] = $element;
-          }
-        }
+    foreach ($tags as $tag) {
+      foreach ($tag['#attributes'] as $key => $property) {
+        $properties[$key] = $property;
       }
     }
 
-    return $rawTags;
+    $this->udo->setProperties($properties);
   }
 
   /**
@@ -274,7 +213,7 @@ class Tealiumiq {
 
     $element += $this->tokenService->tokenBrowser($tokenTypes);
 
-    $groupsAndTags = $this->sortedGroupsWithTags();
+    $groupsAndTags = $this->helper->sortedGroupsWithTags();
 
     foreach ($groupsAndTags as $groupName => $group) {
       // Only act on groups that have tags and are in the list of included
@@ -311,109 +250,6 @@ class Tealiumiq {
     }
 
     return $element;
-  }
-
-  /**
-   * Gets the group plugin definitions.
-   *
-   * @return array
-   *   Group definitions.
-   */
-  protected function groupDefinitions() {
-    return $this->groupPluginManager->getDefinitions();
-  }
-
-  /**
-   * Gets the tag plugin definitions.
-   *
-   * @return array
-   *   Tag definitions
-   */
-  protected function tagDefinitions() {
-    return $this->tagPluginManager->getDefinitions();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function sortedGroups() {
-    $tealiumiqGroups = $this->groupDefinitions();
-
-    // Pull the data from the definitions into a new array.
-    $groups = [];
-    foreach ($tealiumiqGroups as $groupName => $groupInfo) {
-      $groups[$groupName]['id'] = $groupInfo['id'];
-      $groups[$groupName]['label'] = $groupInfo['label']->render();
-      $groups[$groupName]['description'] = $groupInfo['description'];
-      $groups[$groupName]['weight'] = $groupInfo['weight'];
-    }
-
-    // Create the 'sort by' array.
-    $sortBy = [];
-    foreach ($groups as $group) {
-      $sortBy[] = $group['weight'];
-    }
-
-    // Sort the groups by weight.
-    array_multisort($sortBy, SORT_ASC, $groups);
-
-    return $groups;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function sortedTags() {
-    $tealiumiqTags = $this->tagDefinitions();
-
-    // Pull the data from the definitions into a new array.
-    $tags = [];
-    foreach ($tealiumiqTags as $tagName => $tagInfo) {
-      $tags[$tagName]['id'] = $tagInfo['id'];
-      $tags[$tagName]['label'] = $tagInfo['label']->render();
-      $tags[$tagName]['group'] = $tagInfo['group'];
-      $tags[$tagName]['weight'] = $tagInfo['weight'];
-    }
-
-    // Create the 'sort by' array.
-    $sortBy = [];
-    foreach ($tags as $key => $tag) {
-      $sortBy['group'][$key] = $tag['group'];
-      $sortBy['weight'][$key] = $tag['weight'];
-    }
-
-    // Sort the tags by weight.
-    array_multisort($sortBy['group'], SORT_ASC, $sortBy['weight'], SORT_ASC, $tags);
-
-    return $tags;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function sortedGroupsWithTags() {
-    $groups = $this->sortedGroups();
-    $tags = $this->sortedTags();
-
-    foreach ($tags as $tagName => $tag) {
-      $tagGroup = $tag['group'];
-
-      if (!isset($groups[$tagGroup])) {
-        // If the tag is claiming a group that has no matching plugin, log an
-        // error and force it to the basic group.
-        $this->logger->error(
-          "Undefined group '%group' on tag '%tag'",
-          ['%group' => $tagGroup, '%tag' => $tagName]
-        );
-
-        $tag['group'] = 'page';
-        $tagGroup = 'page';
-      }
-
-      $groups[$tagGroup]['tags'][$tagName] = $tag;
-    }
-
-    return $groups;
   }
 
 }

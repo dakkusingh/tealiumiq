@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file
+ * Tealium iQ Integration.
+ */
+
+/**
+ * Implements hook_page_bottom().
+ */
+function tealiumiq_page_bottom(array &$page_bottom) {
+  $route = \Drupal::routeMatch()->getRouteObject();
+  $is_admin = \Drupal::service('router.admin_context')->isAdminRoute($route);
+
+  if (!$is_admin) {
+    // $tealiumiq = \Drupal::service('tealiumiq.tealiumiq');
+    // ksm($tealiumiq->getProperties());
+  }
+}

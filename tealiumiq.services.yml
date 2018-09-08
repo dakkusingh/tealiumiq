@@ -3,9 +3,13 @@ services:
     class: Drupal\tealiumiq\Service\Udo
     arguments: ["@event_dispatcher"]
 
+  tealiumiq.helper:
+    class: Drupal\tealiumiq\Service\Helper
+    arguments: ['@entity_type.manager', '@plugin.manager.tealiumiq.group', '@plugin.manager.tealiumiq.tag', '@logger.factory', '@request_stack', '@language_manager', '@tealiumiq.token', '@current_route_match']
+
   tealiumiq.tealiumiq:
     class: Drupal\tealiumiq\Service\Tealiumiq
-    arguments: ["@config.factory", '@tealiumiq.udo', '@tealiumiq.token', '@plugin.manager.tealiumiq.group', '@plugin.manager.tealiumiq.tag', '@request_stack', '@language_manager', '@logger.factory']
+    arguments: ["@config.factory", '@tealiumiq.udo', '@tealiumiq.token', '@plugin.manager.tealiumiq.group', '@plugin.manager.tealiumiq.tag', '@request_stack', '@language_manager', '@logger.factory', '@tealiumiq.helper']
 
   plugin.manager.tealiumiq.tag:
     class: Drupal\tealiumiq\Service\TagPluginManager
