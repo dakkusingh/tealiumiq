@@ -189,7 +189,7 @@ class Tealiumiq {
     $tags = $this->helper->tagsFromRoute();
 
     foreach ($tags as $tagKey => $tag) {
-      foreach ($tag['#attributes'] as $key => $property) {
+      foreach ($tag['#attributes'] as $property) {
         $properties[$tagKey] = $property;
       }
     }
