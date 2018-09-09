@@ -25,7 +25,7 @@ The primary features include:
  added via custom modules.
  - Tokens may be used to automatically assign values.
  
-## Standard usage scenario
+## Usage scenario - Tealium Tags Field 
 ### Install the module.
 - Open admin/config/services/tealiumiq.
 - Add the Tealium iQ account details. 
@@ -41,4 +41,10 @@ The primary features include:
 - Click the "Save and continue" button.
 - If the site supports multiple languages, and translations have been
  enabled for this entity, select "Users may translate this field" to
-  use Drupal's translation system. 
+  use Drupal's translation system.
+  
+## Usage Schenario - As API
+todo - write documentation
+
+## Usage Schenario - As Context Reaction
+todo - write documentation
