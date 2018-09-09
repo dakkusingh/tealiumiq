@@ -125,7 +125,6 @@ class Tealiumiq {
     $this->groupPluginManager = $groupPluginManager;
     $this->logger = $channelFactory->get('tealiumiq');
     $this->helper = $helper;
-    $this->setUdoProperties();
   }
 
   /**
@@ -186,7 +185,7 @@ class Tealiumiq {
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function setUdoProperties() {
+  public function setUdoPropertiesFromRoute() {
     $tags = $this->helper->tagsFromRoute();
 
     foreach ($tags as $tag) {
