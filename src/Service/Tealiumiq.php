@@ -188,6 +188,10 @@ class Tealiumiq {
   public function setUdoPropertiesFromRoute() {
     $tags = $this->helper->tagsFromRoute();
 
+    if ($tags == NULL) {
+      return;
+    }
+
     foreach ($tags as $tagKey => $tag) {
       foreach ($tag['#attributes'] as $property) {
         $properties[$tagKey] = $property;

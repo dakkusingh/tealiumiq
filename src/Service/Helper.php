@@ -401,9 +401,9 @@ class Helper {
       foreach ($this->tagsFromEntity($entity) as $tag => $data) {
         $tealiumiqTags[$tag] = $data;
       }
-    }
 
-    return $this->generateRawElements($tealiumiqTags, $entity);
+      return $this->generateRawElements($tealiumiqTags, $entity);
+    }
   }
 
   /**
