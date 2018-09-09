@@ -9,7 +9,6 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\views\ViewEntityInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -393,7 +392,8 @@ class Helper {
 
     if (!empty($entity) && $entity instanceof ContentEntityInterface) {
       // If content entity does not have an ID the page is likely an "Add" page,
-      // so do not generate tealiumiq tags for entity which has not been created yet.
+      // so do not generate tealiumiq tags for entity which
+      // has not been created yet.
       if (!$entity->id()) {
         return NULL;
       }
@@ -410,12 +410,13 @@ class Helper {
    * Return the Entity from route.
    *
    * @return mixed|null
+   *   See: content_translation_page_attachments()
    */
   public function routeEntity() {
     // If the current route has no parameters, return.
     if (!($route = $this->routeMatch
-        ->getRouteObject()) || !($parameters = $route
-        ->getOption('parameters'))) {
+      ->getRouteObject()) || !($parameters = $route
+      ->getOption('parameters'))) {
       return;
     }
 
@@ -434,4 +435,5 @@ class Helper {
       return;
     }
   }
+
 }
