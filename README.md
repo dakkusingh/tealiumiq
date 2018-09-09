@@ -5,3 +5,40 @@ deploy new vendor tags and make edits to existing ones in our
 user friendly console.
 
 This module provides Drupal 8 integration with Tealium iQ.
+
+![tealium_iq](https://www.drupal.org/files/what_are_tags_01.png)
+
+## Requirements
+Tealium iQ module for Drupal 8 requires the following:
+
+- Token Module - Provides a popup browser to see the available tokens
+ for use in Tealium iQ tag fields.
+
+## Features
+The primary features include:
+
+- An administration interface to manage default Tealium tags. - TODO
+- Use of standard fields for entity support, allowing for translation
+ and revisioning of Tealium tag values added for individual entities.
+- Basic of Tealium tags available, covering commonly used tags
+- A plugin interface allowing for additional Tealium tags to be easily
+ added via custom modules.
+ - Tokens may be used to automatically assign values.
+ 
+## Standard usage scenario
+### Install the module.
+- Open admin/config/services/tealiumiq.
+- Add the Tealium iQ account details. 
+
+### Add Tealium Tags Field
+- To adjust Tealium Tags for a specific entity, the Tealium field must
+ be added first. Follow these steps:
+- Go to the "Manage fields" of the bundle where the Tealium field is
+ to appear.
+- Select "Tealium tags" from the "Add a new field" selector.
+- Fill in a label for the field, e.g. "Tealium tags", and set an
+ appropriate machine name, e.g. "tealium_tags".
+- Click the "Save and continue" button.
+- If the site supports multiple languages, and translations have been
+ enabled for this entity, select "Users may translate this field" to
+  use Drupal's translation system. 
