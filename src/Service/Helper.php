@@ -114,105 +114,6 @@ class Helper {
   }
 
   /**
-   * Returns the entity of the current route.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface|mixed|null
-   *   Mixed value return.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
-   */
-  public function routeEntity() {
-    $route_name = $this->routeMatch->getRouteName();
-
-    // Look for a canonical entity view page, e.g. node/{nid}, user/{uid}, etc.
-    $matches = [];
-    preg_match('/entity\.(.*)\.(latest[_-]version|canonical)/', $route_name, $matches);
-    if (!empty($matches[1])) {
-      $entity_type = $matches[1];
-      return $this->routeMatch->getParameter($entity_type);
-    }
-
-    // Look for a rest entity view page, e.g. "node/{nid}?_format=json", etc.
-    $matches = [];
-    // Matches e.g. "rest.entity.node.GET.json".
-    preg_match('/rest\.entity\.(.*)\.(.*)\.(.*)/', $route_name, $matches);
-    if (!empty($matches[1])) {
-      $entity_type = $matches[1];
-      return $this->routeMatch->getParameter($entity_type);
-    }
-
-    // Look for entity object 'add' pages, e.g. "node/add/{bundle}".
-    $route_name_matches = [];
-    preg_match('/(entity\.)?(.*)\.add(_form)?/', $route_name, $route_name_matches);
-    if (!empty($route_name_matches[2])) {
-      $entity_type = $route_name_matches[2];
-      $definition = $this->entityTypeManager->getDefinition($entity_type, FALSE);
-      if (!empty($definition)) {
-        $type = $this->routeMatch->getRawParameter($definition->get('bundle_entity_type'));
-        if (!empty($type)) {
-          return $this->entityTypeManager
-            ->getStorage($entity_type)
-            ->create([
-              $definition->get('entity_keys')['bundle'] => $type,
-            ]);
-        }
-      }
-    }
-
-    // Look for entity object 'edit' pages, e.g. "node/{entity_id}/edit".
-    $route_name_matches = [];
-    preg_match('/entity\.(.*)\.edit_form/', $route_name, $route_name_matches);
-    if (!empty($route_name_matches[1])) {
-      $entity_type = $route_name_matches[1];
-      $entity_id = $this->routeMatch->getRawParameter($entity_type);
-
-      if (!empty($entity_id)) {
-        return $this->entityTypeManager
-          ->getStorage($entity_type)
-          ->load($entity_id);
-      }
-    }
-
-    // Look for entity object 'add content translation' pages, e.g.
-    // "node/{nid}/translations/add/{source_lang}/{translation_lang}".
-    $route_name_matches = [];
-    preg_match('/(entity\.)?(.*)\.content_translation_add/', $route_name, $route_name_matches);
-    if (!empty($route_name_matches[2])) {
-      $entity_type = $route_name_matches[2];
-      $definition = $this->entityTypeManager->getDefinition($entity_type, FALSE);
-      if (!empty($definition)) {
-        $node = $this->routeMatch->getParameter($entity_type);
-        $type = $node->bundle();
-        if (!empty($type)) {
-          return $this->entityTypeManager
-            ->getStorage($entity_type)
-            ->create([
-              $definition->get('entity_keys')['bundle'] => $type,
-            ]);
-        }
-      }
-    }
-
-    // Special handling for the admin user_create page.
-    // In this case, there's only one bundle and it's named the
-    // same as the entity type, so some shortcuts can be used.
-    if ($route_name == 'user.admin_create') {
-      $entity_type = $type = 'user';
-      $definition = $this->entityTypeManager->getDefinition($entity_type);
-      if (!empty($type)) {
-        return $this->entityTypeManager
-          ->getStorage($entity_type)
-          ->create([
-            $definition->get('entity_keys')['bundle'] => $type,
-          ]);
-      }
-    }
-
-    return NULL;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function tagsFromEntity(ContentEntityInterface $entity) {
@@ -431,13 +332,7 @@ class Helper {
         // Render any tokens in the value.
         $token_replacements = [];
         if ($entity) {
-          // @todo This needs a better way of discovering the context.
-          if ($entity instanceof ViewEntityInterface) {
-            // Views tokens require the ViewExecutable, not the config entity.
-            // @todo Can we move this into metatag_views somehow?
-            $token_replacements = ['view' => $entity->getExecutable()];
-          }
-          elseif ($entity instanceof ContentEntityInterface) {
+          if ($entity instanceof ContentEntityInterface) {
             $token_replacements = [$entity->getEntityTypeId() => $entity];
           }
         }
@@ -498,7 +393,7 @@ class Helper {
 
     if (!empty($entity) && $entity instanceof ContentEntityInterface) {
       // If content entity does not have an ID the page is likely an "Add" page,
-      // so do not generate meta tags for entity which has not been created yet.
+      // so do not generate tealiumiq tags for entity which has not been created yet.
       if (!$entity->id()) {
         return NULL;
       }
@@ -511,4 +406,32 @@ class Helper {
     return $this->generateRawElements($tealiumiqTags, $entity);
   }
 
+  /**
+   * Return the Entity from route.
+   *
+   * @return mixed|null
+   */
+  public function routeEntity() {
+    // If the current route has no parameters, return.
+    if (!($route = $this->routeMatch
+        ->getRouteObject()) || !($parameters = $route
+        ->getOption('parameters'))) {
+      return;
+    }
+
+    // Determine if the current route represents an entity.
+    foreach ($parameters as $name => $options) {
+      if (!isset($options['type']) || strpos($options['type'], 'entity:') !== 0) {
+        continue;
+      }
+
+      $entity = $this->routeMatch->getParameter($name);
+      if ($entity instanceof ContentEntityInterface) {
+        return $entity;
+      }
+
+      // Since entity was found, no need to iterate further.
+      return;
+    }
+  }
 }
