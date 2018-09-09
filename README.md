@@ -1,4 +1,5 @@
 # Tealium iQ Tag Management
+[![CircleCI](https://circleci.com/gh/dakkusingh/tealiumiq.svg?style=svg)](https://circleci.com/gh/dakkusingh/tealiumiq)
 The Tealium iQ tag management system puts you in control of 
 your marketing technology implementations making it easy to 
 deploy new vendor tags and make edits to existing ones in our 
