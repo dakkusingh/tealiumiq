@@ -300,6 +300,8 @@ class Helper {
    *
    * @return array
    *   Render array with tag elements.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function generateRawElements(array $tags, $entity = NULL) {
     // Ignore the update.php path.
@@ -312,7 +314,7 @@ class Helper {
 
     $tealiumiqTags = $this->tagPluginManager->getDefinitions();
 
-    // Order the elements by weight first, as some systems like Facebook care.
+    // Order the elements by weight first.
     uksort($tags, function ($tagName_a, $tagName_b) use ($tealiumiqTags) {
       $weight_a = isset($tealiumiqTags[$tagName_a]['weight']) ? $tealiumiqTags[$tagName_a]['weight'] : 0;
       $weight_b = isset($tealiumiqTags[$tagName_b]['weight']) ? $tealiumiqTags[$tagName_b]['weight'] : 0;
@@ -379,10 +381,12 @@ class Helper {
    * @param object $entity
    *   Entity if defined.
    *
-   * @return array|null
-   *   Tags if found or null.
+   * @return array
+   *   Tags if found or empty array.
    */
   public function tagsFromRoute($entity = NULL) {
+    $tealiumiqTags = [];
+
     if (!$entity) {
       $entity = $this->routeEntity();
     }
@@ -392,7 +396,7 @@ class Helper {
       // so do not generate tealiumiq tags for entity which
       // has not been created yet.
       if (!$entity->id()) {
-        return NULL;
+        return $tealiumiqTags;
       }
 
       $tealiumiqTags = $this->tagsFromEntity($entity);
@@ -402,7 +406,7 @@ class Helper {
       }
     }
 
-    return NULL;
+    return $tealiumiqTags;
   }
 
   /**

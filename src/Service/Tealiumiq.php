@@ -208,24 +208,21 @@ class Tealiumiq {
 
   /**
    * Set all data values.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function setUdoPropertiesFromRoute() {
-    $tags = $this->helper->tagsFromRoute();
+    // Get the tags from Route.
+    $tealiumiqTags = $this->helper->tagsFromRoute();
 
-    if ($tags == NULL) {
-      return;
-    }
-
-    foreach ($tags as $tagKey => $tag) {
-      foreach ($tag['#attributes'] as $property) {
-        $properties[$tagKey] = $property;
+    if (!empty($tealiumiqTags)) {
+      foreach ($tealiumiqTags as $tagKey => $tag) {
+        foreach ($tag['#attributes'] as $property) {
+          $properties[$tagKey] = $property;
+        }
       }
-    }
 
-    $this->udo->setProperties($properties);
+      // Set the tags in UDO.
+      $this->udo->setProperties($properties);
+    }
   }
 
   /**
