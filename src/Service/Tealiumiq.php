@@ -2,6 +2,7 @@
 
 namespace Drupal\tealiumiq\Service;
 
+use Drupal\Component\Serialization\Json;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
@@ -158,6 +159,22 @@ class Tealiumiq {
   }
 
   /**
+   * Get UTAG embed URL.
+   *
+   * @return string
+   *   UTAG embed value.
+   */
+  public function getUtagUrl() {
+    $url = "//tags.tiqcdn.com/utag/" .
+      $this->account .
+      '/' . $this->profile .
+      '/' . $this->environment .
+      '/utag.js';
+
+    return $url;
+  }
+
+  /**
    * Get async Value.
    *
    * @return string
@@ -177,6 +194,16 @@ class Tealiumiq {
     $properties = $this->udo->getProperties();
 
     return $properties;
+  }
+
+  /**
+   * Export the UDO as JSON.
+   *
+   * @return string
+   *   Json encoded output.
+   */
+  public function getPropertiesJson() {
+    return Json::encode($this->getProperties());
   }
 
   /**

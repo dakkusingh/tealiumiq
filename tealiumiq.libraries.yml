@@ -1,0 +1,8 @@
+tealiumiq:
+  version: 1.x
+  js:
+    js/tealiumiq.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/drupalSettings
