@@ -379,11 +379,8 @@ class Helper {
    * @param object $entity
    *   Entity if defined.
    *
-   * @return array
-   *   Tags if found.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @return array|null
+   *   Tags if found or null.
    */
   public function tagsFromRoute($entity = NULL) {
     if (!$entity) {
@@ -398,12 +395,14 @@ class Helper {
         return NULL;
       }
 
-      foreach ($this->tagsFromEntity($entity) as $tag => $data) {
-        $tealiumiqTags[$tag] = $data;
-      }
+      $tealiumiqTags = $this->tagsFromEntity($entity);
 
-      return $this->generateRawElements($tealiumiqTags, $entity);
+      if (!empty($tealiumiqTags)) {
+        return $this->generateRawElements($tealiumiqTags, $entity);
+      }
     }
+
+    return NULL;
   }
 
   /**

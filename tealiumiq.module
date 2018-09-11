@@ -29,13 +29,17 @@ function tealiumiq_page_attachments_alter(array &$attachments) {
   if (!$is_admin) {
     $tealiumiq = \Drupal::service('tealiumiq.tealiumiq');
     $tealiumiq->setUdoPropertiesFromRoute();
+    $properties = $tealiumiq->getProperties();
 
-    $attachments['#attached']['library'][] = 'tealiumiq/tealiumiq';
-    $attachments['#attached']['drupalSettings']['tealiumiq']['tealiumiq'] = [
-      'utagurl' => $tealiumiq->getUtagUrl(),
-      'async' => $tealiumiq->getAsync(),
-    ];
+    if (!empty($properties)) {
+      $attachments['#attached']['library'][] = 'tealiumiq/tealiumiq';
+      $attachments['#attached']['drupalSettings']['tealiumiq']['tealiumiq'] = [
+        'utagurl' => $tealiumiq->getUtagUrl(),
+        'async' => $tealiumiq->getAsync(),
+      ];
 
-    $attachments['#attached']['drupalSettings']['tealiumiq']['tealiumiq']['utagData'] = $tealiumiq->getProperties();
+      $attachments['#attached']['drupalSettings']['tealiumiq']['tealiumiq']['utagData'] = $properties;
+    }
+
   }
 }
