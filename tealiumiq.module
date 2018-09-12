@@ -14,19 +14,6 @@ function tealiumiq_page_attachments(array &$attachments) {
   $is_admin = \Drupal::service('router.admin_context')->isAdminRoute($route);
 
   if (!$is_admin) {
-    $attachments['#attached']['library'][] = 'tealiumiq/tealiumiq';
-  }
-}
-
-/**
- * Implements hook_page_attachments_alter().
- */
-function tealiumiq_page_attachments_alter(array &$attachments) {
-  // Example Code to implement tealium tags.
-  $route = \Drupal::routeMatch()->getRouteObject();
-  $is_admin = \Drupal::service('router.admin_context')->isAdminRoute($route);
-
-  if (!$is_admin) {
     $tealiumiq = \Drupal::service('tealiumiq.tealiumiq');
     $tealiumiq->setUdoPropertiesFromRoute();
     $properties = $tealiumiq->getProperties();
@@ -40,6 +27,5 @@ function tealiumiq_page_attachments_alter(array &$attachments) {
 
       $attachments['#attached']['drupalSettings']['tealiumiq']['tealiumiq']['utagData'] = $properties;
     }
-
   }
 }
