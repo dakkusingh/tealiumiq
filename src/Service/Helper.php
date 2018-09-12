@@ -383,6 +383,8 @@ class Helper {
    *
    * @return array
    *   Tags if found or empty array.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function tagsFromRoute($entity = NULL) {
     $tealiumiqTags = [];
