@@ -59,6 +59,13 @@ class Settings extends ConfigFormBase {
       '#required' => TRUE,
     ];
 
+    $form['async'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Asynchronous loading'),
+      '#description' => $this->t('Asynchronously load the Tealium iQ Universal Tag.'),
+      '#default_value' => $settings->get('async'),
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 
@@ -70,6 +77,7 @@ class Settings extends ConfigFormBase {
       ->set('account', $form_state->getValue('account'))
       ->set('profile', $form_state->getValue('profile'))
       ->set('environment', $form_state->getValue('environment'))
+      ->set('async', $form_state->getValue('async'))
       ->save();
 
     parent::submitForm($form, $form_state);

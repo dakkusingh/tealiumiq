@@ -14,18 +14,62 @@ function tealiumiq_page_attachments(array &$attachments) {
   $is_admin = \Drupal::service('router.admin_context')->isAdminRoute($route);
 
   if (!$is_admin) {
+    // Get the Tealium iQ service.
     $tealiumiq = \Drupal::service('tealiumiq.tealiumiq');
+
+    // Set the properties from route.
     $tealiumiq->setUdoPropertiesFromRoute();
+
+    // Get all Tealium iQ properties.
     $properties = $tealiumiq->getProperties();
 
-    if (!empty($properties)) {
+    // Add lib and settings if async is true.
+    if (!empty($properties) && $tealiumiq->getAsync() == TRUE) {
       $attachments['#attached']['library'][] = 'tealiumiq/tealiumiq';
       $attachments['#attached']['drupalSettings']['tealiumiq']['tealiumiq'] = [
         'utagurl' => $tealiumiq->getUtagUrl(),
         'async' => $tealiumiq->getAsync(),
       ];
 
+      // Add utag data.
       $attachments['#attached']['drupalSettings']['tealiumiq']['tealiumiq']['utagData'] = $properties;
+    }
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function tealiumiq_theme($existing, $type, $theme, $path) {
+  return [
+    'tealium_sync' => [
+      'template' => 'tealium_sync',
+      'path' => $path . '/templates',
+      'variables' => [
+        'utagurl' => NULL,
+        'utagdata' => NULL,
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_page_bottom().
+ */
+function tealiumiq_page_bottom(array &$page_bottom) {
+  $route = \Drupal::routeMatch()->getRouteObject();
+  $is_admin = \Drupal::service('router.admin_context')->isAdminRoute($route);
+
+  if (!$is_admin) {
+    $tealiumiq = \Drupal::service('tealiumiq.tealiumiq');
+
+    // Only do this if sync version of Tealium iQ is required.
+    if ($tealiumiq->getAsync() != TRUE) {
+      $page_bottom['tealiumiq'] = [
+        '#theme' => 'tealium_sync',
+        '#utagurl' => 'https:' . $tealiumiq->getUtagUrl(),
+        '#utagdata' => $tealiumiq->getPropertiesJson(),
+      ];
     }
   }
 }
