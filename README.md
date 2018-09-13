@@ -49,3 +49,24 @@ todo - write documentation
 
 ## Usage Schenario - As Context Reaction
 todo - write documentation
+
+## Asynchronous and Synchronous Loading
+Official documentation here: 
+https://tealium.com/blog/standard/asynchronous-tagging/
+
+### Asynchronous Loading
+With asynchronous tracking, the browser can load the different 
+tags in parallel. It no longer has to wait for a certain tag to 
+load completely before moving on to the next or the rest of the page 
+content.
+
+![tealium_async](https://tealium.com/wp-content/uploads/2015/03/oct-11-asynchronous-tags.gif)
+
+### Synchronous Loading
+When a page loads a synchronous tag, it waits for the tag content to 
+load before moving on to the next content. The figure below shows an 
+example of a page loading 4 tags in a synchronous or serial manner. 
+The page starts by loading the first tag. After the tag has been 
+completely loaded, the page moves on the second tag.
+
+![tealium_iq](https://tealium.com/wp-content/uploads/2015/03/oct-11-synchronous-tags.gif)
