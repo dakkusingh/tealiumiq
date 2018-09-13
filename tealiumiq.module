@@ -17,22 +17,24 @@ function tealiumiq_page_attachments(array &$attachments) {
     // Get the Tealium iQ service.
     $tealiumiq = \Drupal::service('tealiumiq.tealiumiq');
 
-    // Set the properties from route.
-    $tealiumiq->setUdoPropertiesFromRoute();
+    if ($tealiumiq->getAsync() == TRUE) {
+      // Set the properties from route.
+      $tealiumiq->setUdoPropertiesFromRoute();
 
-    // Get all Tealium iQ properties.
-    $properties = $tealiumiq->getProperties();
+      // Get all Tealium iQ properties.
+      $properties = $tealiumiq->getProperties();
 
-    // Add lib and settings if async is true.
-    if (!empty($properties) && $tealiumiq->getAsync() == TRUE) {
-      $attachments['#attached']['library'][] = 'tealiumiq/tealiumiq';
-      $attachments['#attached']['drupalSettings']['tealiumiq']['tealiumiq'] = [
-        'utagurl' => $tealiumiq->getUtagUrl(),
-        'async' => $tealiumiq->getAsync(),
-      ];
+      // Add lib and settings if async is true.
+      if (!empty($properties)) {
+        $attachments['#attached']['library'][] = 'tealiumiq/tealiumiq_async';
+        $attachments['#attached']['drupalSettings']['tealiumiq']['tealiumiq'] = [
+          'utagurl' => $tealiumiq->getUtagUrl(),
+          'async' => $tealiumiq->getAsync(),
+        ];
 
-      // Add utag data.
-      $attachments['#attached']['drupalSettings']['tealiumiq']['tealiumiq']['utagData'] = $properties;
+        // Add utag data.
+        $attachments['#attached']['drupalSettings']['tealiumiq']['tealiumiq']['utagData'] = $properties;
+      }
     }
   }
 }
