@@ -51,8 +51,8 @@ todo - write documentation
 todo - write documentation
 
 ## Asynchronous and Synchronous Loading
-Official documentation here: 
-https://tealium.com/blog/standard/asynchronous-tagging/
+This setting can be changed at:
+`admin/config/services/tealiumiq`
 
 ### Asynchronous Loading
 With asynchronous tracking, the browser can load the different 
@@ -70,3 +70,6 @@ The page starts by loading the first tag. After the tag has been
 completely loaded, the page moves on the second tag.
 
 ![tealium_iq](https://tealium.com/wp-content/uploads/2015/03/oct-11-synchronous-tags.gif)
+
+### Official documentation: 
+https://tealium.com/blog/standard/asynchronous-tagging/
