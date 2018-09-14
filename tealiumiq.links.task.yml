@@ -1,0 +1,10 @@
+tealiumiq.settings:
+  route_name: 'tealiumiq.settings'
+  base_route: 'tealiumiq.settings'
+  title: 'Tealium iQ Settings'
+  weight: 0
+tealiumiq.defaults:
+  route_name: 'tealiumiq.defaults'
+  base_route: 'tealiumiq.settings'
+  title: 'Tealium iQ Defaults'
+  weight: 10

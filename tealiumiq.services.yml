@@ -5,7 +5,7 @@ services:
 
   tealiumiq.helper:
     class: Drupal\tealiumiq\Service\Helper
-    arguments: ['@entity_type.manager', '@plugin.manager.tealiumiq.group', '@plugin.manager.tealiumiq.tag', '@logger.factory', '@request_stack', '@language_manager', '@tealiumiq.token', '@current_route_match']
+    arguments: ['@entity_type.manager', '@plugin.manager.tealiumiq.group', '@plugin.manager.tealiumiq.tag', '@logger.factory', '@request_stack', '@language_manager', '@tealiumiq.token', '@current_route_match', '@entity_type.bundle.info']
 
   tealiumiq.tealiumiq:
     class: Drupal\tealiumiq\Service\Tealiumiq

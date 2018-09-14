@@ -4,6 +4,9 @@ namespace Drupal\tealiumiq\Service;
 
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\ContentEntityType;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -75,6 +78,13 @@ class Helper {
   private $routeMatch;
 
   /**
+   * EntityTypeBundleInfoInterface.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   */
+  private $entityTypeBundleInfo;
+
+  /**
    * Helper constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
@@ -93,6 +103,8 @@ class Helper {
    *   Tealiumiq Token.
    * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
    *   RouteMatchInterface.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
+   *   EntityTypeBundleInfoInterface.
    */
   public function __construct(EntityTypeManagerInterface $entityTypeManager,
                               GroupPluginManager $groupPluginManager,
@@ -101,7 +113,8 @@ class Helper {
                               RequestStack $requestStack,
                               LanguageManagerInterface $languageManager,
                               TealiumiqToken $token,
-                              RouteMatchInterface $routeMatch) {
+                              RouteMatchInterface $routeMatch,
+                              EntityTypeBundleInfoInterface $entityTypeBundleInfo) {
     $this->entityTypeManager = $entityTypeManager;
     $this->groupPluginManager = $groupPluginManager;
     $this->tagPluginManager = $tagPluginManager;
@@ -110,6 +123,7 @@ class Helper {
     $this->languageManager = $languageManager;
     $this->tokenService = $token;
     $this->routeMatch = $routeMatch;
+    $this->entityTypeBundleInfo = $entityTypeBundleInfo;
   }
 
   /**
@@ -439,6 +453,104 @@ class Helper {
       // Since entity was found, no need to iterate further.
       return;
     }
+  }
+
+  /**
+   * Returns an array of available bundles to override.
+   *
+   * @return array
+   *   A list of available bundles as $id => $label.
+   */
+  public function getAvailableBundles() {
+    $options = [];
+    $entityTypes = $this->getSupportedEntityTypes();
+
+    foreach ($entityTypes as $entityType => $entityLabel) {
+      $options[$entityLabel][$entityType] = "$entityLabel (Default)";
+
+      $bundles = $this->entityTypeBundleInfo->getBundleInfo($entityType);
+
+      foreach ($bundles as $bundleId => $bundleData) {
+        $defaultsId = $entityType . '__' . $bundleId;
+        $options[$entityLabel][$defaultsId] = $bundleData['label'];
+      }
+    }
+
+    return $options;
+  }
+
+  /**
+   * Returns a list of supported entity types.
+   *
+   * @return array
+   *   A list of available entity types as $machine_name => $label.
+   */
+  protected function getSupportedEntityTypes() {
+    $entity_types = [];
+
+    // A list of entity types that are not supported.
+    $unsupported_types = [
+      // Custom blocks.
+      'block_content',
+
+      // Comments.
+      'comment',
+
+      // Contact messages are the messages submitted on individual contact forms
+      // so obviously shouldn't get meta tags.
+      'contact_message',
+
+      // Menu items.
+      'menu_link_content',
+
+      // Shortcut items.
+      'shortcut',
+
+      // Paragraphs library items.
+      'paragraphs_library_item',
+    ];
+
+    // Make a list of supported content types.
+    foreach ($this->entityTypeManager->getDefinitions() as $entity_name => $definition) {
+      // Skip some entity types that we don't want to support.
+      if (in_array($entity_name, $unsupported_types)) {
+        continue;
+      }
+
+      // Identify supported entities.
+      if ($definition instanceof ContentEntityType) {
+        // Only work with entity types that have a list of links, i.e. publicly
+        // viewable.
+        $links = $definition->get('links');
+
+        // TODO Maybe implement a whitelist for entities like paragraphs.
+        if (!empty($links)) {
+          $entity_types[$entity_name] = $this->getEntityTypeLabel($definition);
+        }
+      }
+    }
+
+    return $entity_types;
+  }
+
+  /**
+   * Returns the text label for the entity type specified.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
+   *   The entity type to process.
+   *
+   * @return string
+   *   A label.
+   */
+  protected function getEntityTypeLabel(EntityTypeInterface $entityType) {
+    $label = $entityType->getLabel();
+
+    if (is_a($label, 'Drupal\Core\StringTranslation\TranslatableMarkup')) {
+      /** @var \Drupal\Core\StringTranslation\TranslatableMarkup $label */
+      $label = $label->render();
+    }
+
+    return $label;
   }
 
 }

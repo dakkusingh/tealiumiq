@@ -1,0 +1,2 @@
+page_name: '[current-page:title]'
+page_url: '[current-page:url:absolute]'

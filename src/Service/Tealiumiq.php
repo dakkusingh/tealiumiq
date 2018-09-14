@@ -76,7 +76,7 @@ class Tealiumiq {
    *
    * @var \Drupal\tealiumiq\Service\Helper
    */
-  private $helper;
+  public $helper;
 
   /**
    * Tealiumiq constructor.
@@ -245,7 +245,9 @@ class Tealiumiq {
     foreach ($groupsAndTags as $groupName => $group) {
       // Only act on groups that have tags and are in the list of included
       // groups (unless that list is null).
-      if (isset($group['tags']) && (is_null($includedGroups) || in_array($groupName, $includedGroups) || in_array($group['id'], $includedGroups))) {
+      if (isset($group['tags']) && (is_null($includedGroups) ||
+          in_array($groupName, $includedGroups) ||
+          in_array($group['id'], $includedGroups))) {
         // Create the fieldset.
         $element[$groupName]['#type'] = 'details';
         $element[$groupName]['#title'] = $group['label'];

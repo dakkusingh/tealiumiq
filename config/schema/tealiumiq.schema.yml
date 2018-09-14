@@ -11,6 +11,17 @@ tealiumiq.settings:
     environment:
       type: string
       label: 'Environment'
-    utag_async:
+    async:
       type: boolean
       label: 'Utag Sync'
+
+tealiumiq.defaults:
+  type: config_object
+  label: 'Tealium iQ Defaults'
+  mapping:
+    page_name:
+      type: string
+      label: 'Page Name'
+    page_url:
+      type: string
+      label: 'Page Url'

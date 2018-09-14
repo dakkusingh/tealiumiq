@@ -2,6 +2,7 @@
 
 namespace Drupal\tealiumiq\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -39,6 +40,13 @@ class TealiumiqWidget extends WidgetBase implements ContainerFactoryPluginInterf
   private $tagPluginManager;
 
   /**
+   * ConfigFactoryInterface.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  private $configFactory;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container,
@@ -52,7 +60,8 @@ class TealiumiqWidget extends WidgetBase implements ContainerFactoryPluginInterf
       $configuration['settings'],
       $configuration['third_party_settings'],
       $container->get('tealiumiq.tealiumiq'),
-      $container->get('plugin.manager.tealiumiq.tag')
+      $container->get('plugin.manager.tealiumiq.tag'),
+      $container->get('config.factory')
     );
   }
 
@@ -65,10 +74,12 @@ class TealiumiqWidget extends WidgetBase implements ContainerFactoryPluginInterf
                               array $settings,
                               array $third_party_settings,
                               Tealiumiq $tealiumiq,
-                              TagPluginManager $tagPluginManager) {
+                              TagPluginManager $tagPluginManager,
+                              ConfigFactoryInterface $configFactory) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
     $this->tealiumiq = $tealiumiq;
     $this->tagPluginManager = $tagPluginManager;
+    $this->configFactory = $configFactory;
   }
 
   /**
@@ -85,6 +96,18 @@ class TealiumiqWidget extends WidgetBase implements ContainerFactoryPluginInterf
     $values = [];
     if (!empty($item->value)) {
       $values = unserialize($item->value);
+    }
+
+    // Get default Tealium iQ tags.
+    $defaults = $this->configFactory->get('tealiumiq.defaults')->get();
+
+    // Populate fields which have not been overridden in the entity.
+    if (!empty($defaults)) {
+      foreach ($defaults as $tagId => $tagValue) {
+        if (!isset($values[$tagId]) && !empty($tagValue)) {
+          $values[$tagId] = $tagValue;
+        }
+      }
     }
 
     // Find the current entity type and bundle.

@@ -3,3 +3,8 @@ tealiumiq.settings:
   route_name: tealiumiq.settings
   parent: system.admin_config_services
   description: 'Configure Tealium iQ Tag settings.'
+tealiumiq.defaults:
+  title: 'Tealium iQ Defaults'
+  route_name: tealiumiq.defaults
+  description: 'Configure Tealium iQ Defaults.'
+  parent: tealiumiq.settings
