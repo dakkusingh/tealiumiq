@@ -1,0 +1,8 @@
+{% if utagurl and utagdata %}
+  <!-- Begin Tealium iQ Sync Integration -->
+  <script type="text/javascript">
+    var utag_data = {{ utagdata|raw }};
+  </script>
+  <script src="{{ utagurl|raw }}"></script>
+  <!-- End Tealium iQ Sync Integration -->
+{% endif %}
