@@ -1,0 +1,5 @@
+{
+  "require": {
+    "drupal/context": "^1.0"
+  }
+}

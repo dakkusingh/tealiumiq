@@ -1,0 +1,9 @@
+name: Tealium iQ Context
+description: Provides Context integration for Tealium iQ Tag Management
+type: module
+package: Tealium
+core: 8.x
+dependencies:
+  - tealiumiq:tealiumiq
+  - context:context
+  - token:token

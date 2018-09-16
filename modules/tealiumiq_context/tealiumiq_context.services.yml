@@ -1,0 +1,7 @@
+services:
+  tealiumiq_context.alter.udo.properties:
+    class: Drupal\tealiumiq_context\EventSubscriber\AlterUdoProperties
+    tags:
+      - { name: event_subscriber }
+    arguments:
+      - '@context.manager'
