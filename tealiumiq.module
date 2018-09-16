@@ -64,7 +64,8 @@ function tealiumiq_page_bottom(array &$page_bottom) {
 
   if (!$is_admin) {
     $tealiumiq = \Drupal::service('tealiumiq.tealiumiq');
-
+    // Set the properties from route.
+    $tealiumiq->setUdoPropertiesFromRoute();
     // Only do this if sync version of Tealium iQ is required.
     if ($tealiumiq->getAsync() != TRUE) {
       $page_bottom['tealiumiq'] = [
