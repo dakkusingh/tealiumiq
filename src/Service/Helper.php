@@ -314,8 +314,6 @@ class Helper {
    *
    * @return array
    *   Render array with tag elements.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function generateRawElements(array $tags, $entity = NULL) {
     // Ignore the update.php path.
@@ -390,6 +388,17 @@ class Helper {
   }
 
   /**
+   * Get Entity from Route.
+   *
+   * @return mixed|null
+   *   Return Entity.
+   */
+  public function getEnityFromRoute() {
+    $entity = $this->routeEntity();
+    return $entity;
+  }
+
+  /**
    * Load the tags by processing the route parameters.
    *
    * @param object $entity
@@ -397,8 +406,6 @@ class Helper {
    *
    * @return array
    *   Tags if found or empty array.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function tagsFromRoute($entity = NULL) {
     $tealiumiqTags = [];
@@ -411,14 +418,8 @@ class Helper {
       // If content entity does not have an ID the page is likely an "Add" page,
       // so do not generate tealiumiq tags for entity which
       // has not been created yet.
-      if (!$entity->id()) {
-        return $tealiumiqTags;
-      }
-
-      $tealiumiqTags = $this->tagsFromEntity($entity);
-
-      if (!empty($tealiumiqTags)) {
-        return $this->generateRawElements($tealiumiqTags, $entity);
+      if ($entity->id()) {
+        $tealiumiqTags = $this->tagsFromEntity($entity);
       }
     }
 
@@ -551,6 +552,28 @@ class Helper {
     }
 
     return $label;
+  }
+
+  /**
+   * Return tokenkised values for raw tags.
+   *
+   * @param array $tealiumiqTags
+   *   Raw tags.
+   *
+   * @return array
+   *   tokenised tags.
+   */
+  public function tokenisedTags(array $tealiumiqTags) {
+    $properties = [];
+    if (!empty($tealiumiqTags)) {
+      foreach ($tealiumiqTags as $tagKey => $tag) {
+        foreach ($tag['#attributes'] as $property) {
+          $properties[$tagKey] = $property;
+        }
+      }
+    }
+
+    return $properties;
   }
 
 }

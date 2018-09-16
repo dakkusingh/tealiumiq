@@ -4,8 +4,11 @@ namespace Drupal\tealiumiq\Service;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\tealiumiq\Event\AlterUdoPropertiesEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -79,6 +82,13 @@ class Tealiumiq {
   public $helper;
 
   /**
+   * EventDispatcherInterface.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  private $eventDispatcher;
+
+  /**
    * Tealiumiq constructor.
    *
    * @param \Drupal\Core\Config\ConfigFactory $config
@@ -99,6 +109,8 @@ class Tealiumiq {
    *   Logger Channel Factory Interface.
    * @param \Drupal\tealiumiq\Service\Helper $helper
    *   Tealium Helper.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
+   *   EventDispatcherInterface.
    */
   public function __construct(ConfigFactory $config,
                               Udo $udo,
@@ -108,7 +120,8 @@ class Tealiumiq {
                               RequestStack $requestStack,
                               LanguageManagerInterface $languageManager,
                               LoggerChannelFactoryInterface $channelFactory,
-                              Helper $helper) {
+                              Helper $helper,
+                              EventDispatcherInterface $eventDispatcher) {
     // Get Tealium iQ Settings.
     $this->config = $config->get('tealiumiq.settings');
 
@@ -126,6 +139,7 @@ class Tealiumiq {
     $this->groupPluginManager = $groupPluginManager;
     $this->logger = $channelFactory->get('tealiumiq');
     $this->helper = $helper;
+    $this->eventDispatcher = $eventDispatcher;
   }
 
   /**
@@ -191,9 +205,7 @@ class Tealiumiq {
    *   All variables.
    */
   public function getProperties() {
-    $properties = $this->udo->getProperties();
-
-    return $properties;
+    return $this->udo->getProperties();
   }
 
   /**
@@ -211,18 +223,47 @@ class Tealiumiq {
    */
   public function setUdoPropertiesFromRoute() {
     // Get the tags from Route.
-    $tealiumiqTags = $this->helper->tagsFromRoute();
+    // Set the tags in UDO.
+    $this->setProperties($this->helper->tagsFromRoute());
+  }
 
-    if (!empty($tealiumiqTags)) {
-      foreach ($tealiumiqTags as $tagKey => $tag) {
-        foreach ($tag['#attributes'] as $property) {
-          $properties[$tagKey] = $property;
-        }
+  /**
+   * Set Tealium Tags.
+   *
+   * @param array $properties
+   *   Tags array.
+   */
+  public function setProperties(array $properties = []) {
+    // Allow other modules to property variables before we send it.
+    $alterUDOPropertiesEvent = new AlterUdoPropertiesEvent(
+      $this->udo->getNamespace(),
+      $properties
+    );
+
+    $event = $this->eventDispatcher->dispatch(
+      AlterUdoPropertiesEvent::UDO_ALTER_PROPERTIES,
+      $alterUDOPropertiesEvent
+    );
+
+    // Merge existing and altered properties.
+    $tealiumiqTags = array_merge($properties, $event->getProperties());
+
+    // Process tokens.
+    $entity = $this->helper->getEnityFromRoute();
+    if (!empty($entity) && $entity instanceof ContentEntityInterface) {
+      if ($entity->id() && !empty($tealiumiqTags)) {
+        $tealiumiqTagsTokenised = $this->helper->generateRawElements($tealiumiqTags, $entity);
       }
-
-      // Set the tags in UDO.
-      $this->udo->setProperties($properties);
     }
+    else {
+      $tealiumiqTagsTokenised = $this->helper->generateRawElements($tealiumiqTags);
+    }
+
+    // Cleanup the tags to key value.
+    $tealiumiqTagsTokenised = $this->helper->tokenisedTags($tealiumiqTagsTokenised);
+
+    // Set the tags in UDO.
+    $this->udo->setProperties($tealiumiqTagsTokenised);
   }
 
   /**
