@@ -248,10 +248,15 @@ class Tealiumiq {
     // Merge existing and altered properties.
     $tealiumiqTags = array_merge($properties, $event->getProperties());
 
+    // Dont proceed if there are no tags.
+    if (empty($tealiumiqTags)) {
+      return;
+    }
+
     // Process tokens.
     $entity = $this->helper->getEnityFromRoute();
     if (!empty($entity) && $entity instanceof ContentEntityInterface) {
-      if ($entity->id() && !empty($tealiumiqTags)) {
+      if ($entity->id()) {
         $tealiumiqTagsTokenised = $this->helper->generateRawElements($tealiumiqTags, $entity);
       }
     }
