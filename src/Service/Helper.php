@@ -323,7 +323,6 @@ class Helper {
     }
 
     $rawTags = [];
-
     $tealiumiqTags = $this->tagPluginManager->getDefinitions();
 
     // Order the elements by weight first.
@@ -334,38 +333,29 @@ class Helper {
       return ($weight_a < $weight_b) ? -1 : 1;
     });
 
+    // Render any tokens in the value.
+    $token_replacements = [];
+    if ($entity) {
+      if ($entity instanceof ContentEntityInterface) {
+        $token_replacements = [$entity->getEntityTypeId() => $entity];
+      }
+    }
+
     // Each element of the $values array is a tag with the tag plugin name as
     // the key.
     foreach ($tags as $tagName => $value) {
+
       // Check to ensure there is a matching plugin.
       if (isset($tealiumiqTags[$tagName])) {
         // Get an instance of the plugin.
         $tag = $this->tagPluginManager->createInstance($tagName);
-
-        // Render any tokens in the value.
-        $token_replacements = [];
-        if ($entity) {
-          if ($entity instanceof ContentEntityInterface) {
-            $token_replacements = [$entity->getEntityTypeId() => $entity];
-          }
-        }
 
         // Set the value as sometimes the data needs massaging, such as when
         // field defaults are used for the Robots field, which come as an array
         // that needs to be filtered and converted to a string.
         // @see Robots::setValue()
         $tag->setValue($value);
-        $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
-
-        $processed_value = PlainTextOutput::renderFromHtml(
-          htmlspecialchars_decode(
-            $this->tokenService->replace(
-              $tag->value(),
-              $token_replacements,
-              ['langcode' => $langcode]
-            )
-          )
-        );
+        $processed_value = $this->processTokens($tag->value(), $token_replacements);
 
         // Now store the value with processed tokens back into the plugin.
         $tag->setValue($processed_value);
@@ -382,9 +372,51 @@ class Helper {
           }
         }
       }
+      else {
+        // Maybe there are arbitrary tags that are being generated.
+        // This could be because tag fields are being defined outside in custom
+        // modules or done on the fly.
+        $processed_value = $this->processTokens($value, $token_replacements);
+
+        // Emulate a fake tag.
+        // See \Drupal\tealiumiq\Plugin\tealium\Tag\TagBase::output
+        $element = [
+          '#tag' => 'tealiumiq',
+          '#attributes' => [
+            'name' => $tagName,
+            'content' => $processed_value,
+          ],
+        ];
+
+        $rawTags[$tagName] = $element;
+      }
     }
 
     return $rawTags;
+  }
+
+  /**
+   * Process Tokens for all values.
+   *
+   * @param string $value
+   * @param array $token_replacements
+   *
+   * @return string
+   */
+  private function processTokens($value, array $token_replacements = []) {
+    $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
+
+    $processed_value = PlainTextOutput::renderFromHtml(
+      htmlspecialchars_decode(
+        $this->tokenService->replace(
+          $value,
+          $token_replacements,
+          ['langcode' => $langcode]
+        )
+      )
+    );
+
+    return $processed_value;
   }
 
   /**
