@@ -27,10 +27,10 @@ class AlterUdoProperties implements EventSubscriberInterface {
   public function doAlterUdoProperties(AlterUdoPropertiesEvent $event) {
     // Example.
     /*
-    $event->setProperties(
-    ['foo' => 'bar']
-    );
-     */
+    $properties = $event->getProperties();
+    $properties['custom_var'] = '[current-page:title]';
+    $event->setProperties($properties);
+    */
   }
 
 }
