@@ -245,8 +245,8 @@ class Tealiumiq {
       $alterUDOPropertiesEvent
     );
 
-    // Merge existing and altered properties.
-    $tealiumiqTags = array_merge($properties, $event->getProperties());
+    // Altered properties.
+    $tealiumiqTags = $event->getProperties();
 
     // Dont proceed if there are no tags.
     if (empty($tealiumiqTags)) {
