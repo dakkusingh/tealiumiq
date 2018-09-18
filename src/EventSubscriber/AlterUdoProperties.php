@@ -30,7 +30,7 @@ class AlterUdoProperties implements EventSubscriberInterface {
     $properties = $event->getProperties();
     $properties['custom_var'] = '[current-page:title]';
     $event->setProperties($properties);
-    */
+     */
   }
 
 }

@@ -379,7 +379,7 @@ class Helper {
         $processed_value = $this->processTokens($value, $token_replacements);
 
         // Emulate a fake tag.
-        // See \Drupal\tealiumiq\Plugin\tealium\Tag\TagBase::output
+        // See \Drupal\tealiumiq\Plugin\tealium\Tag\TagBase::output.
         $element = [
           '#tag' => 'tealiumiq',
           '#attributes' => [
@@ -399,9 +399,12 @@ class Helper {
    * Process Tokens for all values.
    *
    * @param string $value
+   *   Raw value.
    * @param array $token_replacements
+   *   Token patterns.
    *
    * @return string
+   *   Tokenised value.
    */
   private function processTokens($value, array $token_replacements = []) {
     $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
