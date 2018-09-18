@@ -47,9 +47,14 @@ class AlterUdoProperties implements EventSubscriberInterface {
       unset($tealiumiqContext['id']);
 
       if (!empty($tealiumiqContext)) {
-        $event->setProperties(
-          $tealiumiqContext
-        );
+        // Get the current properties. Maybe other events set these!
+        $properties = $event->getProperties();
+
+        // Be inclusive, do not replace all properties.
+        $properties = array_merge($properties, $tealiumiqContext);
+
+        // Set them.
+        $event->setProperties($properties);
       }
     }
   }
