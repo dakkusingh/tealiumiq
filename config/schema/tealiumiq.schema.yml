@@ -11,9 +11,12 @@ tealiumiq.settings:
     environment:
       type: string
       label: 'Environment'
-    async:
-      type: boolean
-      label: 'Utag Sync'
+    tag_load:
+      type: string
+      label: 'Utag Async or Sync'
+    sync_load_position:
+      type: string
+      label: 'Add Tealium iQ Tags to the top or bottom of the page'
     api_only:
       type: boolean
       label: 'API Only'

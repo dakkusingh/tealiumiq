@@ -129,7 +129,6 @@ class Tealiumiq {
     $this->account = $this->config->get('account');
     $this->profile = $this->config->get('profile');
     $this->environment = $this->config->get('environment');
-    $this->async = $this->config->get('async');
 
     $this->udo = $udo;
     $this->tagPluginManager = $tagPluginManager;
@@ -191,11 +190,18 @@ class Tealiumiq {
   /**
    * Get async Value.
    *
-   * @return string
+   * @return bool
    *   async value.
    */
   public function getAsync() {
-    return $this->async;
+    $tagLoad = $this->config->get('tag_load');
+
+    if ($tagLoad == 'async') {
+      return TRUE;
+    }
+    elseif ($tagLoad == 'sync') {
+      return FALSE;
+    }
   }
 
   /**

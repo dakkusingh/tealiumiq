@@ -59,11 +59,33 @@ class Settings extends ConfigFormBase {
       '#required' => TRUE,
     ];
 
-    $form['async'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Asynchronous loading'),
-      '#description' => $this->t('Asynchronously load the Tealium iQ Universal Tag.'),
-      '#default_value' => $settings->get('async'),
+    $form['tag_load'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Tag loading'),
+      '#description' => $this->t('Load the tag Asynchronously or Synchronously.'),
+      '#default_value' => $settings->get('tag_load'),
+      '#options' => [
+        'async' => $this->t('Asynchronous'),
+        'sync' => $this->t('Synchronous'),
+      ],
+      '#required' => TRUE,
+    ];
+
+    $form['sync_load_position'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Synchronous tag loading position'),
+      '#description' => $this->t('Add Tealium iQ Tags to the top or bottom of the page.'),
+      '#default_value' => $settings->get('sync_load_position'),
+      '#options' => [
+        'top' => $this->t('Top of the page.'),
+        'bottom' => $this->t('Bottom of the page.'),
+      ],
+      '#states' => [
+        'visible' => [
+          ':input[name="tag_load"]' => ['value' => 'sync'],
+        ],
+      ],
+      '#required' => TRUE,
     ];
 
     $form['api_only'] = [
@@ -86,7 +108,8 @@ class Settings extends ConfigFormBase {
       ->set('account', $form_state->getValue('account'))
       ->set('profile', $form_state->getValue('profile'))
       ->set('environment', $form_state->getValue('environment'))
-      ->set('async', $form_state->getValue('async'))
+      ->set('tag_load', $form_state->getValue('tag_load'))
+      ->set('sync_load_position', $form_state->getValue('sync_load_position'))
       ->set('api_only', $form_state->getValue('api_only'))
       ->save();
 

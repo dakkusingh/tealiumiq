@@ -70,17 +70,54 @@ function tealiumiq_page_bottom(array &$page_bottom) {
   // custom or headless / decoupled implementation.
   $apiOnly = \Drupal::config('tealiumiq.settings')->get('api_only');
 
+  // Get Sync load position.
+  $syncLoadPosition = \Drupal::config('tealiumiq.settings')->get('sync_load_position');
+
   if (!$is_admin && $apiOnly == FALSE) {
     $tealiumiq = \Drupal::service('tealiumiq.tealiumiq');
 
     // Only set the tags if Synchronous tags is enabled.
-    if ($tealiumiq->getAsync() == FALSE) {
+    if ($tealiumiq->getAsync() == FALSE && $syncLoadPosition == 'bottom') {
       // Set the properties from route.
       $tealiumiq->setUdoPropertiesFromRoute();
 
       // Only do this if sync version of Tealium iQ is required.
       if (!empty($tealiumiq->getProperties())) {
         $page_bottom['tealiumiq'] = [
+          '#theme' => 'tealium_sync',
+          '#utagurl' => 'https:' . $tealiumiq->getUtagUrl(),
+          '#utagdata' => $tealiumiq->getPropertiesJson(),
+        ];
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_page_top().
+ */
+function tealiumiq_page_top(array &$page_top) {
+  $route = \Drupal::routeMatch()->getRouteObject();
+  $is_admin = \Drupal::service('router.admin_context')->isAdminRoute($route);
+
+  // Allow API only check, maybe other modules want to have their own
+  // custom or headless / decoupled implementation.
+  $apiOnly = \Drupal::config('tealiumiq.settings')->get('api_only');
+
+  // Get Sync load position.
+  $syncLoadPosition = \Drupal::config('tealiumiq.settings')->get('sync_load_position');
+
+  if (!$is_admin && $apiOnly == FALSE) {
+    $tealiumiq = \Drupal::service('tealiumiq.tealiumiq');
+
+    // Only set the tags if Synchronous tags is enabled.
+    if ($tealiumiq->getAsync() == FALSE && $syncLoadPosition == 'top') {
+      // Set the properties from route.
+      $tealiumiq->setUdoPropertiesFromRoute();
+
+      // Only do this if sync version of Tealium iQ is required.
+      if (!empty($tealiumiq->getProperties())) {
+        $page_top['tealiumiq'] = [
           '#theme' => 'tealium_sync',
           '#utagurl' => 'https:' . $tealiumiq->getUtagUrl(),
           '#utagdata' => $tealiumiq->getPropertiesJson(),

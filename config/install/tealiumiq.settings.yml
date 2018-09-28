@@ -1,5 +1,6 @@
 account: ''
 profile: ''
 environment: 'dev'
-async: true
+tag_load: 'async'
+sync_load_position: 'bottom'
 api_only: false
