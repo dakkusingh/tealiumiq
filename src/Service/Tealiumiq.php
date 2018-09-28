@@ -124,6 +124,7 @@ class Tealiumiq {
                               EventDispatcherInterface $eventDispatcher) {
     // Get Tealium iQ Settings.
     $this->config = $config->get('tealiumiq.settings');
+    $this->globalConfig = $config->get('tealiumiq.defaults');
 
     // Tealium iQ Settings.
     $this->account = $this->config->get('account');
@@ -240,6 +241,13 @@ class Tealiumiq {
    *   Tags array.
    */
   public function setProperties(array $properties = []) {
+    // Are we allowed to use defaults?
+    if ($this->config->get('defaults_everywhere') == TRUE) {
+      // Get default values.
+      $defaultValues = $this->getDefaultTagValues();
+      $properties = array_merge($defaultValues, $properties);
+    }
+
     // Allow other modules to property variables before we send it.
     $alterUDOPropertiesEvent = new AlterUdoPropertiesEvent(
       $this->udo->getNamespace(),
@@ -331,6 +339,30 @@ class Tealiumiq {
     }
 
     return $element;
+  }
+
+  /**
+   * Get default tag values.
+   *
+   * @return array
+   *   Default tags array.
+   */
+  public function getDefaultTagValues() {
+    // Get all global values.
+    $defaults = $this->globalConfig->get();
+
+    // Get all tags.
+    $allTags = $this->helper->sortedTags();
+    $values = [];
+
+    // Make sure only valid tags are taken forward.
+    foreach ($allTags as $tag) {
+      if (array_key_exists($tag['id'], $defaults) && $defaults[$tag['id']] != NULL) {
+        $values[$tag['id']] = $defaults[$tag['id']];
+      }
+    }
+
+    return $values;
   }
 
 }

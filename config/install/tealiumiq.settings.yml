@@ -4,3 +4,4 @@ environment: 'dev'
 tag_load: 'async'
 sync_load_position: 'bottom'
 api_only: false
+defaults_everywhere: true

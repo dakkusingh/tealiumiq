@@ -97,6 +97,15 @@ class Settings extends ConfigFormBase {
       '#default_value' => $settings->get('api_only'),
     ];
 
+    $form['defaults_everywhere'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Defaults Everywhere'),
+      '#description' => $this->t('Use default tags everywhere as the base, 
+                                  these can then be overridden by entity, context and custom modules. 
+                                  For advanced use cases, you might want to disable defaults.'),
+      '#default_value' => $settings->get('defaults_everywhere'),
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 
@@ -111,6 +120,7 @@ class Settings extends ConfigFormBase {
       ->set('tag_load', $form_state->getValue('tag_load'))
       ->set('sync_load_position', $form_state->getValue('sync_load_position'))
       ->set('api_only', $form_state->getValue('api_only'))
+      ->set('defaults_everywhere', $form_state->getValue('defaults_everywhere'))
       ->save();
 
     parent::submitForm($form, $form_state);

@@ -20,6 +20,9 @@ tealiumiq.settings:
     api_only:
       type: boolean
       label: 'API Only'
+    defaults_everywhere:
+      type: boolean
+      label: 'Defaults everywhere'
 
 tealiumiq.defaults:
   type: config_object
