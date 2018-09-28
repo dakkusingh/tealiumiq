@@ -13,7 +13,11 @@ function tealiumiq_page_attachments(array &$attachments) {
   $route = \Drupal::routeMatch()->getRouteObject();
   $is_admin = \Drupal::service('router.admin_context')->isAdminRoute($route);
 
-  if (!$is_admin) {
+  // Allow API only check, maybe other modules want to have their own
+  // custom or headless / decoupled implementation.
+  $apiOnly = \Drupal::config('tealiumiq.settings')->get('api_only');
+
+  if (!$is_admin && $apiOnly == FALSE) {
     // Get the Tealium iQ service.
     $tealiumiq = \Drupal::service('tealiumiq.tealiumiq');
 
@@ -62,7 +66,11 @@ function tealiumiq_page_bottom(array &$page_bottom) {
   $route = \Drupal::routeMatch()->getRouteObject();
   $is_admin = \Drupal::service('router.admin_context')->isAdminRoute($route);
 
-  if (!$is_admin) {
+  // Allow API only check, maybe other modules want to have their own
+  // custom or headless / decoupled implementation.
+  $apiOnly = \Drupal::config('tealiumiq.settings')->get('api_only');
+
+  if (!$is_admin && $apiOnly == FALSE) {
     $tealiumiq = \Drupal::service('tealiumiq.tealiumiq');
 
     // Only set the tags if Synchronous tags is enabled.

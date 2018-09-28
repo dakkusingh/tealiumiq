@@ -66,6 +66,15 @@ class Settings extends ConfigFormBase {
       '#default_value' => $settings->get('async'),
     ];
 
+    $form['api_only'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('API Only'),
+      '#description' => $this->t('Check this option for decoupled sites or custom tag implementations. 
+                                  When checked, the core module will not output tags to the page - 
+                                  allowing you to have a custom implementation in your own modules.'),
+      '#default_value' => $settings->get('api_only'),
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 
@@ -78,6 +87,7 @@ class Settings extends ConfigFormBase {
       ->set('profile', $form_state->getValue('profile'))
       ->set('environment', $form_state->getValue('environment'))
       ->set('async', $form_state->getValue('async'))
+      ->set('api_only', $form_state->getValue('api_only'))
       ->save();
 
     parent::submitForm($form, $form_state);
