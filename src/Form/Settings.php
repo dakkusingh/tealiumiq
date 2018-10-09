@@ -106,6 +106,17 @@ class Settings extends ConfigFormBase {
       '#default_value' => $settings->get('defaults_everywhere'),
     ];
 
+    $form['defer_fields'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Defer field tags'),
+      '#description' => $this->t('This changes the order in which the tags are applied. 
+                                  if checked, tags will be applied as 
+                                  1) Default tags 
+                                  2) Context + Custom Events 
+                                  3) Field tags from entities.'),
+      '#default_value' => $settings->get('defer_fields'),
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 
@@ -121,6 +132,7 @@ class Settings extends ConfigFormBase {
       ->set('sync_load_position', $form_state->getValue('sync_load_position'))
       ->set('api_only', $form_state->getValue('api_only'))
       ->set('defaults_everywhere', $form_state->getValue('defaults_everywhere'))
+      ->set('defer_fields', $form_state->getValue('defer_fields'))
       ->save();
 
     parent::submitForm($form, $form_state);

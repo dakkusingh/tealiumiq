@@ -241,17 +241,24 @@ class Tealiumiq {
    *   Tags array.
    */
   public function setProperties(array $properties = []) {
+    $newProperties = [];
+    $deferField = $this->config->get('defer_fields');
+
+    if ($deferField == FALSE) {
+      $newProperties = $properties;
+    }
+
     // Are we allowed to use defaults?
     if ($this->config->get('defaults_everywhere') == TRUE) {
       // Get default values.
       $defaultValues = $this->getDefaultTagValues();
-      $properties = array_merge($defaultValues, $properties);
+      $newProperties = array_merge($defaultValues, $newProperties);
     }
 
     // Allow other modules to property variables before we send it.
     $alterUDOPropertiesEvent = new AlterUdoPropertiesEvent(
       $this->udo->getNamespace(),
-      $properties
+      $newProperties
     );
 
     $event = $this->eventDispatcher->dispatch(
@@ -261,6 +268,10 @@ class Tealiumiq {
 
     // Altered properties.
     $tealiumiqTags = $event->getProperties();
+
+    if ($deferField == TRUE) {
+      $tealiumiqTags = array_merge($tealiumiqTags, $properties);
+    }
 
     // Dont proceed if there are no tags.
     if (empty($tealiumiqTags)) {

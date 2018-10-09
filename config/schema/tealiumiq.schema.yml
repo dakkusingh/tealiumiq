@@ -23,6 +23,9 @@ tealiumiq.settings:
     defaults_everywhere:
       type: boolean
       label: 'Defaults everywhere'
+    defer_fields:
+      type: boolean
+      label: 'Defer fields'
 
 tealiumiq.defaults:
   type: config_object
