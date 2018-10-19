@@ -14,6 +14,6 @@ tealiumiq.defaults:
     _form: 'Drupal\tealiumiq\Form\Defaults'
     _title: 'Tealium iQ Defaults'
   requirements:
-    _permission: 'administer site configuration'
+    _permission: 'manage global tealium tags'
   options:
     _admin_route: TRUE
