@@ -1,10 +1,17 @@
+tealiumiq.overview:
+  title: 'Tealium iQ'
+  route_name: tealiumiq.overview
+  description: 'Configure Tealium iQ Tags.'
+  parent: system.admin_config_services
+
 tealiumiq.settings:
   title: 'Tealium iQ Settings'
   route_name: tealiumiq.settings
-  parent: system.admin_config_services
   description: 'Configure Tealium iQ Tag settings.'
+  parent: tealiumiq.overview
+
 tealiumiq.defaults:
   title: 'Tealium iQ Defaults'
   route_name: tealiumiq.defaults
   description: 'Configure Tealium iQ Defaults.'
-  parent: tealiumiq.settings
+  parent: tealiumiq.overview

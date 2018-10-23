@@ -1,4 +1,9 @@
 manage global tealium tags:
   title: 'Manage global tealium tags'
-  description: 'Users with this permission will be able to manage the tealium settings'
+  description: 'Users with this permission will be able to manage the tealium global tag setting'
+  restrict access: TRUE
+
+administer tealium settings:
+  title: 'Administer Tealium settings'
+  description: 'Users with this permission will be able to administer tealium settings'
   restrict access: TRUE

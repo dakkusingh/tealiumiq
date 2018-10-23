@@ -1,10 +1,20 @@
-tealiumiq.settings:
+tealiumiq.overview:
   path: '/admin/config/services/tealiumiq'
+  defaults:
+    _controller: 'Drupal\tealiumiq\Controller\Overview::doOverview'
+    _title: 'Tealium iQ'
+  requirements:
+    _permission: 'manage global tealium tags'
+  options:
+    _admin_route: TRUE
+
+tealiumiq.settings:
+  path: '/admin/config/services/tealiumiq/settings'
   defaults:
     _form: 'Drupal\tealiumiq\Form\Settings'
     _title: 'Tealium iQ Settings'
   requirements:
-    _permission: 'administer site configuration'
+    _permission: 'administer tealium settings'
   options:
     _admin_route: TRUE
 
