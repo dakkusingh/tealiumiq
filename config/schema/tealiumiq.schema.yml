@@ -26,6 +26,9 @@ tealiumiq.settings:
     defer_fields:
       type: boolean
       label: 'Defer fields'
+    json_encoded:
+      type: string
+      label: 'JSON Encoded'
 
 tealiumiq.defaults:
   type: config_object

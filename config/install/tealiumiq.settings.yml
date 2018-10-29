@@ -6,3 +6,4 @@ sync_load_position: 'bottom'
 api_only: false
 defaults_everywhere: true
 defer_fields: false
+json_encoded: drp

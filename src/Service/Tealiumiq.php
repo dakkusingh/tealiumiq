@@ -222,6 +222,11 @@ class Tealiumiq {
    *   Json encoded output.
    */
   public function getPropertiesJson() {
+    $jsonEncoded = $this->config->get('json_encoded');
+    if ($jsonEncoded == 'php') {
+      return json_encode($this->getProperties());
+    }
+
     return Json::encode($this->getProperties());
   }
 

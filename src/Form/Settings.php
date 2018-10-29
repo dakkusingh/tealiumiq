@@ -117,6 +117,18 @@ class Settings extends ConfigFormBase {
       '#default_value' => $settings->get('defer_fields'),
     ];
 
+    $form['json_encoded'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('JSON Encoded'),
+      '#description' => $this->t('Using Drupal: use Json::encode,
+                                  Using PHP: use json_encode.'),
+      '#options' => [
+        'dru' => $this->t('Using Drupal'),
+        'php' => $this->t('Using PHP'),
+      ],
+      '#default_value' => $settings->get('json_encoded'),
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 
@@ -133,6 +145,7 @@ class Settings extends ConfigFormBase {
       ->set('api_only', $form_state->getValue('api_only'))
       ->set('defaults_everywhere', $form_state->getValue('defaults_everywhere'))
       ->set('defer_fields', $form_state->getValue('defer_fields'))
+      ->set('json_encoded', $form_state->getValue('json_encoded'))
       ->save();
 
     parent::submitForm($form, $form_state);
