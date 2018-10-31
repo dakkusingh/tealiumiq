@@ -240,12 +240,26 @@ class Tealiumiq {
   }
 
   /**
+   * Set all data values.
+   *
+   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   *   Entity.
+   */
+  public function setUdoPropertiesFromEntity(ContentEntityInterface $entity) {
+    // Get the tags from Route.
+    // Set the tags in UDO.
+    $this->setProperties($this->helper->tagsFromRoute($entity), $entity);
+  }
+
+  /**
    * Set Tealium Tags.
    *
    * @param array $properties
    *   Tags array.
+   * @param \Drupal\Core\Entity\ContentEntityInterface|null $entity
+   *   Entity.
    */
-  public function setProperties(array $properties = []) {
+  public function setProperties(array $properties = [], ContentEntityInterface $entity = NULL) {
     $newProperties = [];
     $deferField = $this->config->get('defer_fields');
 
@@ -284,7 +298,10 @@ class Tealiumiq {
     }
 
     // Process tokens.
-    $entity = $this->helper->getEnityFromRoute();
+    if (!$entity) {
+      $entity = $this->helper->getEnityFromRoute();
+    }
+
     if (!empty($entity) && $entity instanceof ContentEntityInterface) {
       if ($entity->id()) {
         $tealiumiqTagsTokenised = $this->helper->generateRawElements($tealiumiqTags, $entity);

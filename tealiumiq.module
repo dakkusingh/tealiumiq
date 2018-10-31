@@ -5,6 +5,9 @@
  * Tealium iQ Integration.
  */
 
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+
 /**
  * Implements hook_page_attachments().
  */
@@ -125,4 +128,38 @@ function tealiumiq_page_top(array &$page_top) {
       }
     }
   }
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ *
+ * Create a "fake" tealium field so we can store tags for REST.
+ * Normalisers will run on this field.
+ *
+ * @see \metatag_entity_base_field_info()
+ */
+function tealiumiq_entity_base_field_info(EntityTypeInterface $entity_type) {
+  $fields = [];
+  $base_table = $entity_type->getBaseTable();
+  $canonical_template_exists = $entity_type->hasLinkTemplate('canonical');
+
+  // Certain classes are just not supported.
+  $original_class = $entity_type->getOriginalClass();
+  $classes_to_skip = [
+    'Drupal\comment\Entity\Comment',
+  ];
+
+  // If the entity type doesn't have a base table, has no link template then
+  // there's no point in supporting it.
+  if (!empty($base_table) && $canonical_template_exists && !in_array($original_class, $classes_to_skip)) {
+    $fields['tealiumiq'] = BaseFieldDefinition::create('map')
+      ->setLabel(t('Tealium Tags'))
+      ->setDescription(t('The Tealium tags for the entity.'))
+      ->setClass('\Drupal\tealiumiq\Plugin\Field\TealiumiqEntityFieldItemList')
+      ->setComputed(TRUE)
+      ->setTranslatable(TRUE)
+      ->setTargetEntityTypeId($entity_type->id());
+  }
+
+  return $fields;
 }
