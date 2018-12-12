@@ -8,6 +8,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\tealiumiq\Event\AlterUdoPropertiesEvent;
+use Drupal\tealiumiq\Event\FinalAlterUdoPropertiesEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -314,8 +315,22 @@ class Tealiumiq {
     // Cleanup the tags to key value.
     $tealiumiqTagsTokenised = $this->helper->tokenisedTags($tealiumiqTagsTokenised);
 
+    // Allow other modules to property variables before we send it.
+    $finalAlterUDOPropertiesEvent = new FinalAlterUdoPropertiesEvent(
+      $this->udo->getNamespace(),
+      $tealiumiqTagsTokenised
+    );
+
+    $finalEvent = $this->eventDispatcher->dispatch(
+      FinalAlterUdoPropertiesEvent::FINAL_UDO_ALTER_PROPERTIES,
+      $finalAlterUDOPropertiesEvent
+    );
+
+    // Final Altered properties.
+    $finalTealiumiqTagsTokenised = $finalEvent->getProperties();
+
     // Set the tags in UDO.
-    $this->udo->setProperties($tealiumiqTagsTokenised);
+    $this->udo->setProperties($finalTealiumiqTagsTokenised);
   }
 
   /**

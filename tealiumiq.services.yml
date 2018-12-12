@@ -23,6 +23,11 @@ services:
     tags:
       - { name: event_subscriber }
 
+  tealiumiq.final.alter.udo.properties:
+    class: Drupal\tealiumiq\EventSubscriber\FinalAlterUdoProperties
+    tags:
+      - { name: event_subscriber }
+
   tealiumiq.token:
     class: Drupal\tealiumiq\Service\TealiumiqToken
     arguments: ['@token']
