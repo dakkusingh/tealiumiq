@@ -303,6 +303,8 @@ class Tealiumiq {
       $entity = $this->helper->getEnityFromRoute();
     }
 
+    $tealiumiqTagsTokenised = [];
+
     if (!empty($entity) && $entity instanceof ContentEntityInterface) {
       if ($entity->id()) {
         $tealiumiqTagsTokenised = $this->helper->generateRawElements($tealiumiqTags, $entity);
